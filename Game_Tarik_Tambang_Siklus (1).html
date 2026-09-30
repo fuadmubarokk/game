@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tarik Tambang Siklus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Andika:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#DDEFE3;
+  --paper:#FBFDF7;
+  --ink:#1D3528;
+  --muted:#557261;
+  --line:#B9D6C3;
+  --sun:#FFC93C;
+  --teamA:#E8742A;
+  --teamA-soft:#FDE3D0;
+  --teamA-deep:#B9531B;
+  --teamB:#2A74C9;
+  --teamB-soft:#D6E6F8;
+  --teamB-deep:#1B5496;
+  --ok:#2E9E5B;
+  --ok-soft:#D4F1DF;
+  --bad:#D2433A;
+  --bad-soft:#FADAD7;
+  --grass:#9CCB7A;
+  --soil:#C9A46A;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Andika","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:clamp(14px,1.5vmin + 6px,22px);overflow:hidden;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+button{font-family:var(--display);font-weight:800;cursor:pointer;border:0;color:inherit}
+button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
+.app{height:100%;display:flex;flex-direction:column;padding-inline:16px;padding-block:10px;gap:10px;box-sizing:border-box;max-width:1900px;margin:0 auto}
+
+.intro{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;overflow:auto}
+.intro h1{font-family:var(--display);font-size:clamp(38px,7.5vmin,100px);line-height:.95;margin:0;text-wrap:balance}
+.intro h1 .a{color:var(--teamA)}
+.intro h1 .b{color:var(--teamB)}
+.intro p{max-width:36em;margin:0;color:var(--muted);text-wrap:balance}
+.setup{background:var(--paper);border-radius:28px;padding:clamp(16px,3vmin,34px);display:grid;gap:16px;width:min(100%,880px);box-sizing:border-box;box-shadow:0 6px 0 var(--line)}
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.teams label{display:grid;gap:6px;text-align:left;font-weight:700}
+.teams input{font:inherit;font-family:var(--display);font-weight:800;font-size:1.2em;padding:10px 14px;border-radius:14px;border:3px solid var(--teamA);background:#fff;color:var(--ink);min-width:0}
+.teams label:last-child input{border-color:var(--teamB)}
+.opts-row{display:flex;flex-wrap:wrap;gap:10px 16px;justify-content:center;align-items:center}
+.optlabel{font-weight:700;color:var(--muted)}
+.seg{display:flex;background:var(--bg);border-radius:999px;padding:4px;gap:4px;flex-wrap:wrap;justify-content:center}
+.seg button{padding:8px 16px;border-radius:999px;background:transparent;font-size:.95em}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.big{font-size:clamp(22px,3.2vmin,40px);padding:.45em 1.4em;border-radius:999px;background:var(--sun);box-shadow:0 6px 0 #D9A21C}
+.big:active{transform:translateY(4px);box-shadow:0 2px 0 #D9A21C}
+.hint{color:var(--muted);font-size:.9em}
+
+.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
+.top .ttl{font-family:var(--display);font-weight:800;font-size:1.3em;line-height:1}
+.top .ttl small{display:block;font-family:var(--body);font-size:.55em;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.timer{font-family:var(--display);font-weight:800;font-size:1.7em;line-height:1;font-variant-numeric:tabular-nums;text-align:center}
+.timer.low{color:var(--bad)}
+.tools{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.ic{background:var(--paper);border-radius:12px;padding:6px 12px;font-size:.8em;color:var(--muted)}
+
+.scene{position:relative;height:clamp(130px,25vh,300px);flex:none;border-radius:24px;overflow:hidden;background:linear-gradient(var(--teamA-soft),var(--teamA-soft)) left/50% 100% no-repeat,linear-gradient(var(--teamB-soft),var(--teamB-soft)) right/50% 100% no-repeat}
+.scene svg{position:absolute;inset:0;width:100%;height:100%}
+.pull{transition:transform .7s cubic-bezier(.3,1.4,.5,1)}
+.lean{transform-box:fill-box;transform-origin:50% 100%;transform:rotate(-7deg);transition:transform .3s}
+.heave .lean{animation:heave .6s ease-out}
+.slip .lean{animation:slip .6s ease-out}
+.cheer .lean{animation:cheer .7s ease-in-out infinite}
+.fall .lean{transform:rotate(62deg);transition:transform .6s ease-in}
+@keyframes heave{0%{transform:rotate(-7deg)}35%{transform:rotate(-20deg)}100%{transform:rotate(-7deg)}}
+@keyframes slip{0%{transform:rotate(-7deg)}35%{transform:rotate(10deg)}100%{transform:rotate(-7deg)}}
+@keyframes cheer{0%,100%{transform:rotate(-4deg) translateY(0)}50%{transform:rotate(-4deg) translateY(-14px)}}
+.steps{position:absolute;top:8px;left:50%;transform:translateX(-50%);display:flex;gap:6px;background:rgba(251,253,247,.85);padding:5px 10px;border-radius:999px}
+.steps i{width:clamp(10px,1.4vmin,16px);height:clamp(10px,1.4vmin,16px);border-radius:50%;background:var(--line);display:block}
+.steps i.c{background:var(--ink)}
+.steps i.a{background:var(--teamA)}
+.steps i.b{background:var(--teamB)}
+
+.halves{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:14px;min-height:0}
+.side{container-type:size;position:relative;background:var(--paper);border-radius:24px;padding:clamp(10px,2cqw,18px);display:flex;flex-direction:column;gap:clamp(6px,1.6cqh,14px);min-width:0;min-height:0;box-sizing:border-box;border-top:10px solid var(--teamA);overflow:hidden}
+.side.b{border-top-color:var(--teamB)}
+.shead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.shead .nm{font-family:var(--display);font-weight:800;font-size:clamp(18px,min(5cqw,6cqh),40px);line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.side.a .shead .nm{color:var(--teamA-deep)}
+.side.b .shead .nm{color:var(--teamB-deep)}
+.shead .st{font-weight:700;color:var(--muted);font-size:clamp(12px,min(2.6cqw,3.4cqh),20px);white-space:nowrap;font-variant-numeric:tabular-nums}
+.qbox{flex:1;min-height:0;display:flex;align-items:center;gap:clamp(8px,2cqw,18px);background:var(--bg);border-radius:18px;padding:clamp(8px,2cqw,18px)}
+.qimg{flex:none;height:min(100%,24cqh,26cqw);aspect-ratio:1;background:var(--paper);border-radius:16px;display:grid;place-items:center}
+.qimg svg{width:86%;height:86%}
+.qt{font-family:var(--display);font-weight:800;font-size:clamp(16px,min(4.2cqw,6.2cqh),38px);line-height:1.15;text-wrap:balance;min-width:0}
+.qt small{display:block;font-family:var(--body);font-weight:700;font-size:.5em;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:clamp(6px,1.6cqw,12px);flex:none}
+.opt{display:flex;align-items:center;gap:clamp(6px,1.4cqw,12px);text-align:left;background:#fff;border:3px solid var(--line);border-radius:18px;padding:clamp(8px,1.6cqh,16px) clamp(8px,1.6cqw,14px);min-height:clamp(52px,14cqh,120px);font-size:clamp(14px,min(3.4cqw,5cqh),30px);line-height:1.1;box-shadow:0 4px 0 var(--line);touch-action:none;transition:transform .08s,background .15s,border-color .15s}
+.opt .k{flex:none;width:1.6em;height:1.6em;border-radius:50%;display:grid;place-items:center;font-size:.8em;color:#fff}
+.side.a .opt .k{background:var(--teamA)}
+.side.b .opt .k{background:var(--teamB)}
+.opt .tx{min-width:0;overflow-wrap:break-word}
+.opt:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.right .k{background:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad);animation:shake .4s}
+.opt.wrong .k{background:var(--bad)}
+.opt.dim{opacity:.45}
+.toast{position:absolute;left:50%;top:26%;transform:translate(-50%,-50%);font-family:var(--display);font-weight:800;font-size:clamp(28px,min(10cqw,14cqh),84px);line-height:1;padding:.2em .6em;border-radius:24px;pointer-events:none;animation:pop .5s;z-index:3}
+.toast.ok{background:var(--ok);color:#fff}
+.toast.no{background:var(--bad);color:#fff;font-size:clamp(20px,min(6cqw,9cqh),52px)}
+
+.ov{position:fixed;inset:0;background:rgba(29,53,40,.5);display:grid;place-items:center;z-index:40;padding:16px}
+.ovbox{background:var(--paper);border-radius:28px;padding:clamp(18px,3vmin,36px);width:min(100%,820px);display:grid;gap:14px;text-align:center;animation:pop .4s;box-sizing:border-box}
+.ovbox h2{font-family:var(--display);font-size:clamp(30px,6vmin,72px);line-height:1;margin:0}
+.ovstats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ovstats div{border-radius:18px;padding:12px;display:grid;gap:2px}
+.ovstats .a{background:var(--teamA-soft)}
+.ovstats .b{background:var(--teamB-soft)}
+.ovstats b{font-family:var(--display);font-size:1.3em}
+.ovstats span{color:var(--muted);font-weight:700;font-size:.9em;font-variant-numeric:tabular-nums}
+.row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{font-size:1.1em;padding:.5em 1.3em;border-radius:999px;background:var(--paper);box-shadow:0 5px 0 var(--line);border:2px solid var(--line)}
+
+@keyframes shake{0%,100%{translate:0}20%{translate:-8px}40%{translate:8px}60%{translate:-5px}80%{translate:4px}}
+@keyframes pop{from{transform:translate(-50%,-50%) scale(.6);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
+.ovbox{animation-name:popbox}
+@keyframes popbox{from{transform:scale(.9);opacity:.3}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:760px){body{overflow:auto}.app{height:auto;min-height:100%}.halves{grid-template-columns:1fr}.side{height:70vh}.teams{grid-template-columns:1fr}}
+</style>
+
+<div class="app" id="app"></div>
+
+<script>
+const W=(p)=>`<svg viewBox="0 0 100 100" aria-hidden="true">${p}</svg>`;
+const water=`<rect x="4" y="48" width="92" height="46" rx="10" fill="#9ED3EC"/><path d="M4 50 Q16 44 28 50 T52 50 T76 50 T96 50" stroke="#5FAED3" stroke-width="3" fill="none"/>`;
+const cat=(s,c)=>{const t=(v)=>50+(v-50)*s;return `<g transform="translate(${50-50*s} ${100-100*s+ (1-s)*-6}) scale(${s})"><ellipse cx="54" cy="74" rx="30" ry="18" fill="${c}"/><path d="M82 74 Q98 60 90 42" stroke="${c}" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="36" cy="46" r="22" fill="${c}"/><path d="M18 36 L20 14 L34 28Z M54 36 L52 14 L38 28Z" fill="${c}"/><path d="M22 30 L22 20 L29 27Z M50 30 L50 20 L43 27Z" fill="#F5B7B1"/><circle cx="28" cy="44" r="3.5" fill="#1D3528"/><circle cx="44" cy="44" r="3.5" fill="#1D3528"/><path d="M33 52 L39 52 L36 55Z" fill="#E77F86"/><path d="M14 52 L28 54 M14 58 L28 56 M58 52 L44 54 M58 58 L44 56" stroke="#1D3528" stroke-width="1.3"/><rect x="30" y="84" width="8" height="10" rx="3" fill="${c}"/><rect x="62" y="84" width="8" height="10" rx="3" fill="${c}"/></g>`};
+const ART={
+telur_kupu:W(`<path d="M8 74 Q40 40 92 40 Q72 76 8 74Z" fill="#6BB85C"/><path d="M12 72 Q50 56 88 42" stroke="#3F8A35" stroke-width="2.5" fill="none"/>${[[38,54],[50,50],[62,48],[44,62],[56,58],[68,54]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="5.5" fill="#FFF6D5" stroke="#CDB76A" stroke-width="1.5"/>`).join('')}`),
+ulat:W(`<path d="M4 82 Q50 60 96 80 L96 96 L4 96Z" fill="#6BB85C"/>${[0,1,2,3,4,5].map(i=>`<circle cx="${16+i*11}" cy="${62-Math.sin(i/5*Math.PI)*12}" r="9" fill="#8CCB55" stroke="#4E8A2E" stroke-width="2"/>`).join('')}<circle cx="84" cy="56" r="12" fill="#8CCB55" stroke="#4E8A2E" stroke-width="2"/><circle cx="88" cy="53" r="2.6" fill="#1D3528"/><path d="M82 45 L78 34 M88 45 L92 34" stroke="#1D3528" stroke-width="2" stroke-linecap="round"/>`),
+kepompong:W(`<rect x="14" y="10" width="72" height="8" rx="4" fill="#8A5A34"/><path d="M50 18 L50 26" stroke="#8A5A34" stroke-width="3"/><path d="M50 24 C70 36 70 72 50 92 C30 72 30 36 50 24Z" fill="#9CCB62" stroke="#5E8C33" stroke-width="3"/><path d="M38 46 Q50 52 62 46 M36 60 Q50 66 64 60 M40 74 Q50 79 60 74" stroke="#5E8C33" stroke-width="2.5" fill="none"/>`),
+kupu:W(`<ellipse cx="30" cy="36" rx="22" ry="18" fill="#F29A2E" stroke="#1D3528" stroke-width="3" transform="rotate(-20 30 36)"/><ellipse cx="70" cy="36" rx="22" ry="18" fill="#F29A2E" stroke="#1D3528" stroke-width="3" transform="rotate(20 70 36)"/><ellipse cx="34" cy="66" rx="15" ry="13" fill="#F6BC5E" stroke="#1D3528" stroke-width="3"/><ellipse cx="66" cy="66" rx="15" ry="13" fill="#F6BC5E" stroke="#1D3528" stroke-width="3"/><circle cx="26" cy="32" r="4" fill="#fff"/><circle cx="74" cy="32" r="4" fill="#fff"/><rect x="46" y="24" width="8" height="56" rx="4" fill="#1D3528"/><path d="M48 26 Q42 12 36 10 M52 26 Q58 12 64 10" stroke="#1D3528" stroke-width="2.5" fill="none" stroke-linecap="round"/>`),
+telur_katak:W(water+[[30,62],[44,58],[58,62],[72,60],[36,76],[50,72],[64,76],[44,86],[58,86]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="7.5" fill="#E8F6FB" fill-opacity=".85" stroke="#B5DCEB" stroke-width="1.5"/><circle cx="${x}" cy="${y}" r="2.8" fill="#1D3528"/>`).join('')),
+berudu:W(water.replace('y="48"','y="20"').replace('height="46"','height="74"').replace(/M4 50[^"]+/,'M4 22 Q16 16 28 22 T52 22 T76 22 T96 22')+`<ellipse cx="38" cy="56" rx="17" ry="13" fill="#3C3F3A"/><path d="M54 54 Q72 42 90 58 Q72 64 54 60Z" fill="#555A52"/><circle cx="30" cy="52" r="4" fill="#fff"/><circle cx="29" cy="52" r="2" fill="#1D3528"/>`),
+katak_muda:W(water.replace('y="48"','y="20"').replace('height="46"','height="74"').replace(/M4 50[^"]+/,'M4 22 Q16 16 28 22 T52 22 T76 22 T96 22')+`<path d="M58 60 Q76 52 92 66 Q76 70 58 66Z" fill="#6E8E4A"/><ellipse cx="40" cy="60" rx="20" ry="14" fill="#7FA653"/><path d="M50 70 Q60 82 50 88 M30 70 Q24 82 32 88" stroke="#7FA653" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="30" cy="50" r="6" fill="#7FA653"/><circle cx="30" cy="49" r="3" fill="#1D3528"/>`),
+katak:W(`<ellipse cx="50" cy="90" rx="44" ry="7" fill="#6BB85C"/><path d="M20 84 Q8 70 22 62 M80 84 Q92 70 78 62" stroke="#4E9A3E" stroke-width="10" fill="none" stroke-linecap="round"/><ellipse cx="50" cy="62" rx="30" ry="24" fill="#5DB24A"/><circle cx="34" cy="40" r="10" fill="#5DB24A"/><circle cx="66" cy="40" r="10" fill="#5DB24A"/><circle cx="34" cy="39" r="6" fill="#fff"/><circle cx="66" cy="39" r="6" fill="#fff"/><circle cx="35" cy="40" r="3" fill="#1D3528"/><circle cx="67" cy="40" r="3" fill="#1D3528"/><path d="M36 64 Q50 72 64 64" stroke="#2F6B24" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="50" cy="72" rx="16" ry="8" fill="#B8E08E"/>`),
+telur_nyamuk:W(water+`<g>${[0,1,2,3,4,5,6].map(i=>`<ellipse cx="${26+i*8}" cy="47" rx="3.4" ry="7" fill="#2F2A26"/>`).join('')}</g>`),
+jentik:W(water+`<path d="M60 50 L60 44" stroke="#3B342E" stroke-width="3"/><path d="M60 52 Q54 60 48 66 Q42 72 38 82" stroke="#3B342E" stroke-width="5" fill="none" stroke-linecap="round"/><ellipse cx="36" cy="86" rx="6" ry="5" fill="#3B342E"/><path d="M58 56 L66 58 M54 62 L62 64 M48 68 L56 72" stroke="#3B342E" stroke-width="1.5"/>`),
+pupa_nyamuk:W(water+`<path d="M44 54 Q62 50 64 64 Q64 76 54 82 Q58 70 48 66 Q40 62 44 54Z" fill="#3B342E"/><path d="M50 54 L48 46 M56 53 L58 45" stroke="#3B342E" stroke-width="2.5"/><circle cx="52" cy="60" r="2" fill="#fff"/>`),
+nyamuk:W(`<ellipse cx="38" cy="36" rx="22" ry="9" fill="#CFE6F2" fill-opacity=".9" stroke="#7FA9BE" stroke-width="2" transform="rotate(-25 38 36)"/><ellipse cx="60" cy="34" rx="20" ry="8" fill="#CFE6F2" fill-opacity=".9" stroke="#7FA9BE" stroke-width="2" transform="rotate(15 60 34)"/><path d="M40 52 Q60 48 82 60" stroke="#3B342E" stroke-width="7" stroke-linecap="round" fill="none"/><circle cx="34" cy="52" r="7" fill="#3B342E"/><path d="M28 54 L8 64" stroke="#3B342E" stroke-width="2.5" stroke-linecap="round"/><path d="M46 54 L34 76 L30 92 M54 54 L50 78 L52 94 M62 56 L66 78 L74 92 M50 52 L28 70 M58 54 L76 72 M66 58 L90 74" stroke="#3B342E" stroke-width="1.8" fill="none" stroke-linecap="round"/>`),
+telur_ayam:W(`<path d="M10 78 Q50 100 90 78 L86 70 Q50 86 14 70Z" fill="#C79A5B"/><path d="M14 72 Q30 80 40 76 M56 78 Q72 80 86 72" stroke="#9C7338" stroke-width="2" fill="none"/><ellipse cx="50" cy="52" rx="22" ry="28" fill="#F7E9D2" stroke="#D8C2A0" stroke-width="2"/><ellipse cx="42" cy="40" rx="5" ry="8" fill="#fff" opacity=".7"/>`),
+anak_ayam:W(`<ellipse cx="50" cy="92" rx="30" ry="5" fill="#C9E0B9"/><ellipse cx="52" cy="66" rx="26" ry="22" fill="#FFD84A"/><circle cx="38" cy="42" r="16" fill="#FFD84A"/><path d="M22 42 L12 46 L22 50Z" fill="#F29A2E"/><circle cx="34" cy="38" r="3" fill="#1D3528"/><path d="M58 60 Q70 56 72 68" stroke="#E8B72E" stroke-width="3" fill="none"/><path d="M44 86 L42 94 M58 86 L60 94" stroke="#F29A2E" stroke-width="3" stroke-linecap="round"/>`),
+ayam_muda:W(`<ellipse cx="50" cy="94" rx="32" ry="4" fill="#C9E0B9"/><path d="M72 50 Q90 40 88 62 Q82 70 74 66Z" fill="#B9844C"/><ellipse cx="52" cy="62" rx="26" ry="20" fill="#E3C08D"/><circle cx="32" cy="38" r="12" fill="#E3C08D"/><path d="M28 26 Q32 22 36 26 Z" fill="#E4574C"/><path d="M20 38 L12 41 L20 44Z" fill="#F29A2E"/><circle cx="29" cy="36" r="2.6" fill="#1D3528"/><path d="M44 80 L42 92 M58 80 L60 92" stroke="#F29A2E" stroke-width="3" stroke-linecap="round"/>`),
+ayam:W(`<ellipse cx="50" cy="95" rx="36" ry="4" fill="#C9E0B9"/><path d="M70 44 Q96 22 94 56 Q90 70 76 66Z" fill="#8A4B2A"/><path d="M76 40 Q92 30 90 50" stroke="#2E5E3E" stroke-width="4" fill="none"/><ellipse cx="52" cy="62" rx="30" ry="22" fill="#F4F0E6" stroke="#D6CDB9" stroke-width="2"/><path d="M34 60 Q52 74 70 58" stroke="#D6CDB9" stroke-width="3" fill="none"/><circle cx="30" cy="34" r="14" fill="#F4F0E6" stroke="#D6CDB9" stroke-width="2"/><path d="M20 22 Q24 12 28 20 Q31 10 35 20 Q40 14 40 24Z" fill="#E4574C"/><path d="M17 34 L7 38 L17 42Z" fill="#F29A2E"/><path d="M20 44 Q22 52 26 46Z" fill="#E4574C"/><circle cx="26" cy="32" r="2.8" fill="#1D3528"/><path d="M44 82 L42 94 M60 82 L62 94" stroke="#F29A2E" stroke-width="3.5" stroke-linecap="round"/>`),
+telur_kecoak:W(`<rect x="8" y="76" width="84" height="16" rx="6" fill="#D9C7A8"/><rect x="22" y="36" width="56" height="40" rx="18" fill="#8A5A34" stroke="#5E3B20" stroke-width="3"/><path d="M26 54 L74 54" stroke="#C48A55" stroke-width="3"/>${[0,1,2,3,4,5].map(i=>`<path d="M${32+i*7} 40 L${32+i*7} 50" stroke="#5E3B20" stroke-width="2"/>`).join('')}`),
+nimfa_kecoak:W(`<rect x="8" y="80" width="84" height="12" rx="6" fill="#D9C7A8"/><path d="M36 58 L22 72 M46 62 L42 78 M58 62 L62 78 M66 58 L80 72 M36 50 L20 44 M66 50 L82 44" stroke="#8A5A34" stroke-width="2.5" stroke-linecap="round"/><ellipse cx="51" cy="56" rx="18" ry="12" fill="#C48A55" stroke="#8A5A34" stroke-width="2"/><circle cx="51" cy="42" r="6" fill="#A86E3C"/><path d="M48 38 Q38 22 28 22 M54 38 Q64 22 74 22" stroke="#8A5A34" stroke-width="1.8" fill="none"/>`),
+kecoak:W(`<rect x="4" y="84" width="92" height="10" rx="5" fill="#D9C7A8"/><path d="M34 60 L14 80 M44 66 L36 86 M58 66 L66 86 M68 60 L88 80 M34 50 L12 44 M68 50 L90 44" stroke="#4A2A16" stroke-width="3" stroke-linecap="round"/><ellipse cx="51" cy="56" rx="24" ry="20" fill="#6B3A1E"/><path d="M51 38 L51 76" stroke="#3A1E0E" stroke-width="2.5"/><ellipse cx="51" cy="34" rx="10" ry="7" fill="#8A5A34"/><path d="M47 30 Q30 8 12 10 M55 30 Q72 8 90 10" stroke="#4A2A16" stroke-width="2" fill="none"/>`),
+telur_belalang:W(`<rect x="4" y="40" width="92" height="54" rx="10" fill="#A67B52"/><path d="M4 42 Q30 34 50 42 T96 40" stroke="#6BB85C" stroke-width="6" fill="none"/><ellipse cx="50" cy="70" rx="26" ry="14" fill="#7A5634"/>${[0,1,2,3,4].map(i=>`<ellipse cx="${34+i*8}" cy="70" rx="3.5" ry="8" fill="#F2DB8A"/>`).join('')}`),
+nimfa_belalang:W(`<ellipse cx="50" cy="90" rx="40" ry="6" fill="#9BCB7A"/><path d="M46 66 L36 84 M58 66 L62 84 M70 60 Q84 44 88 82" stroke="#4E9A3E" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="58" cy="60" rx="20" ry="9" fill="#8BC34A"/><circle cx="34" cy="54" r="12" fill="#8BC34A"/><circle cx="30" cy="51" r="3.2" fill="#1D3528"/><path d="M30 44 Q20 26 10 24" stroke="#4E9A3E" stroke-width="2" fill="none"/>`),
+belalang:W(`<ellipse cx="50" cy="92" rx="44" ry="5" fill="#9BCB7A"/><path d="M40 62 L30 86 M52 64 L52 86" stroke="#3E7F30" stroke-width="3" stroke-linecap="round"/><path d="M62 58 Q86 30 92 84" stroke="#3E7F30" stroke-width="5" fill="none" stroke-linecap="round"/><ellipse cx="56" cy="56" rx="32" ry="10" fill="#6DAF3E"/><path d="M36 50 Q64 40 92 54 Q64 58 36 54Z" fill="#A6D36A" stroke="#3E7F30" stroke-width="1.5"/><circle cx="22" cy="52" r="11" fill="#6DAF3E"/><circle cx="18" cy="49" r="3.2" fill="#1D3528"/><path d="M20 42 Q12 22 4 18" stroke="#3E7F30" stroke-width="2" fill="none"/>`),
+anak_kucing:W(cat(.62,'#F0A04B')),
+kucing_remaja:W(cat(.8,'#EC9338')),
+kucing:W(cat(.98,'#E2842A')),
+};
+const BANK=[
+{q:'Hewan berubah bentuk dari kecil sampai dewasa. Apa namanya?',a:['metamorfosis','bertelur','melahirkan','bernapas']},
+{q:'Telur kupu-kupu menetas menjadi apa?',a:['ulat (larva)','kepompong (pupa)','kupu-kupu','nimfa']},
+{q:'Ulat akan berubah menjadi apa?',a:['kepompong (pupa)','telur','nimfa','berudu']},
+{q:'Serangga dewasa disebut apa?',a:['imago','larva','pupa','nimfa']},
+{q:'Pupa disebut juga apa?',a:['kepompong','ulat','berudu','imago']},
+{q:'Metamorfosis sempurna punya berapa tahap?',a:['4 tahap','3 tahap','2 tahap','5 tahap']},
+{q:'Metamorfosis tidak sempurna punya berapa tahap?',a:['3 tahap','4 tahap','2 tahap','6 tahap']},
+{q:'Belalang tidak melewati tahap apa?',a:['kepompong (pupa)','telur','nimfa','imago']},
+{q:'Hewan mana yang mengalami metamorfosis sempurna?',a:['kupu-kupu','belalang','ayam','kucing']},
+{q:'Hewan mana yang mengalami metamorfosis tidak sempurna?',a:['belalang','kupu-kupu','nyamuk','lebah']},
+{q:'Capung mengalami metamorfosis apa?',a:['tidak sempurna','sempurna','amfibi','tidak mengalami metamorfosis']},
+{q:'Nyamuk mengalami metamorfosis apa?',a:['sempurna','tidak sempurna','amfibi','tidak mengalami metamorfosis']},
+{q:'Kecoak mengalami metamorfosis apa?',a:['tidak sempurna','sempurna','amfibi','tidak mengalami metamorfosis']},
+{q:'Lebah mengalami metamorfosis apa?',a:['sempurna','tidak sempurna','amfibi','tidak mengalami metamorfosis']},
+{q:'Katak dan kodok termasuk hewan apa?',a:['amfibi','serangga','burung','ikan']},
+{q:'Berudu bernapas dengan apa?',a:['insang','paru-paru','hidung','sayap']},
+{q:'Anak katak berekor panjang dan belum punya kaki. Apa namanya?',a:['berudu','ulat','nimfa','imago']},
+{q:'Kaki berudu mana yang tumbuh lebih dulu?',a:['kaki belakang','kaki depan','semua bersamaan','tidak ada kaki']},
+{q:'Setelah berudu berkaki, katak menjadi apa?',a:['katak berekor','telur','berudu','kepompong']},
+{q:'Di mana katak betina meletakkan telurnya?',a:['di air','di pohon','di pasir','di sarang burung']},
+{q:'Katak berekor bisa hidup di darat. Bagian tubuh apa yang mulai berkembang?',a:['paru-paru','insang','sirip','ekor']},
+{q:'Hewan mana yang tidak mengalami metamorfosis?',a:['ayam','kupu-kupu','katak','belalang']},
+{q:'Telur ayam menetas menjadi apa?',a:['anak ayam','ayam dewasa','telur','kepompong']},
+{q:'Siklus hidup kucing dimulai dari apa?',a:['bayi kucing','telur','kepompong','berudu']},
+{q:'Anak kucing akan tumbuh menjadi apa?',a:['kucing remaja','bayi kucing','telur','kepompong']},
+{q:'Hewan mana yang bertelur?',a:['bebek','kucing','kelinci','beruang']},
+{q:'Hewan mana yang melahirkan?',a:['kelinci','ayam','bebek','kupu-kupu']},
+{q:'Hewan yang bertelur memulai hidupnya dari apa?',a:['telur','anak hewan','kepompong','nimfa']},
+{q:'Ayam, kucing, dan kuda tidak berubah bentuk. Apa yang berubah?',a:['ukuran tubuhnya','bentuk kakinya','cara bernapasnya','jumlah kakinya']},
+{q:'Apa yang paling banyak dilakukan ulat?',a:['makan dan tumbuh','tidur','terbang','bertelur']},
+{q:'Apakah kuda mengalami metamorfosis?',a:['tidak','ya, sempurna','ya, amfibi','ya, tidak sempurna']},
+{q:'Tahap terakhir belalang disebut apa?',a:['imago bersayap','nimfa awal','telur','kepompong']},
+{img:'kepompong',q:'Ini tahap kupu-kupu yang disebut apa?',a:['pupa (kepompong)','larva (ulat)','telur','imago']},
+{img:'ulat',q:'Ini tahap kupu-kupu yang disebut apa?',a:['larva (ulat)','pupa (kepompong)','imago','telur']},
+{img:'kupu',q:'Kupu-kupu dewasa ini disebut apa?',a:['imago','pupa','larva','nimfa']},
+{img:'berudu',q:'Apa nama anak katak ini?',a:['berudu','larva','ulat','nimfa']},
+{img:'katak_muda',q:'Katak ini masih punya ekor. Apa namanya?',a:['katak berekor','berudu','telur katak','katak dewasa']},
+{img:'telur_katak',q:'Ini telur hewan apa?',a:['katak','kupu-kupu','ayam','kucing']},
+{img:'nimfa_belalang',q:'Belalang muda ini disebut apa?',a:['nimfa','larva','pupa','berudu']},
+{img:'anak_ayam',q:'Ini tahap ayam yang disebut apa?',a:['anak ayam','telur','ayam dewasa','telur menetas']},
+{img:'anak_kucing',q:'Kucing kecil ini disebut apa?',a:['anak kucing','kucing dewasa','kucing remaja','telur']},
+];
+
+const $=(s,r=document)=>r.querySelector(s);
+const app=$('#app');
+const shuffle=(a)=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=(t)=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+let G={names:['Tim Jeruk','Tim Langit'],target:5,time:180,sound:true,pos:0,right:[0,0],wrong:[0,0],missed:[[],[]],deck:[[],[]],cur:[null,null],lock:[false,false],over:false,left:0,n:[0,0]};
+let tick=null,audio=null;
+const STEP=260;
+
+function beep(f,d=.12,type='sine',v=.15){if(!G.sound)return;try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();const o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(audio.destination);const t=audio.currentTime;g.gain.exponentialRampToValueAtTime(.001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
+const sfx={ok:()=>{beep(660,.1);setTimeout(()=>beep(990,.16),90)},bad:()=>beep(200,.25,'sawtooth',.07),win:()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.22),i*150)),tick:()=>beep(900,.05,'square',.04)};
+
+function intro(){
+  clearInterval(tick);document.querySelector('.ov')?.remove();
+  app.innerHTML=`<section class="intro">
+    <h1>Tarik Tambang <span class="a">Si</span><span class="b">klus</span></h1>
+    <p>Dua perwakilan kelompok maju bersamaan. Jawab soal di sisi masing-masing. Setiap jawaban benar menarik tali satu langkah ke arah timmu.</p>
+    <div class="setup">
+      <div class="teams">
+        <label for="nA">Kelompok kiri<input id="nA" maxlength="18" value="${esc(G.names[0])}"></label>
+        <label for="nB">Kelompok kanan<input id="nB" maxlength="18" value="${esc(G.names[1])}"></label>
+      </div>
+      <div class="opts-row"><span class="optlabel">Jarak menang</span>
+        <div class="seg" data-k="target">${[[3,'3 langkah'],[5,'5 langkah'],[7,'7 langkah']].map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${G.target===v}">${l}</button>`).join('')}</div></div>
+      <div class="opts-row"><span class="optlabel">Waktu</span>
+        <div class="seg" data-k="time">${[[0,'Tanpa'],[120,'2 menit'],[180,'3 menit'],[300,'5 menit']].map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${G.time===v}">${l}</button>`).join('')}</div></div>
+      <div><button class="big" id="go" type="button">Mulai tarik!</button></div>
+      <div class="hint">Menang jika tali tertarik sampai garis timmu. Jika waktu habis, tim yang tali ada di sisinya menang.</div>
+    </div>
+  </section>`;
+  app.querySelectorAll('.seg').forEach(seg=>seg.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;G[seg.dataset.k]=+b.dataset.v;seg.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b))}));
+  $('#go').onclick=()=>{G.names=[$('#nA').value.trim()||'Kelompok A',$('#nB').value.trim()||'Kelompok B'];start()};
+}
+
+function person(x,shirt,dir){
+  return `<g transform="translate(${x} 0) scale(${dir} 1)"><g class="lean">
+    <path d="M0 176 L-24 226 M0 176 L22 226" stroke="#2B3A32" stroke-width="11" stroke-linecap="round" fill="none"/>
+    <path d="M-30 226 h14 M16 226 h14" stroke="#2B3A32" stroke-width="9" stroke-linecap="round"/>
+    <path d="M0 178 L-6 118" stroke="${shirt}" stroke-width="30" stroke-linecap="round"/>
+    <path d="M-4 128 Q16 142 44 150" stroke="#E9B98E" stroke-width="9" stroke-linecap="round" fill="none"/>
+    <circle cx="-9" cy="94" r="19" fill="#E9B98E"/>
+    <path d="M-28 90 Q-26 70 -8 72 Q10 72 10 88 Q-4 80 -28 90Z" fill="#2B2320"/>
+    <circle cx="0" cy="96" r="2.6" fill="#2B2320"/>
+    <circle cx="44" cy="150" r="7" fill="#E9B98E"/>
+  </g></g>`;
+}
+function scene(){
+  const L=600-STEP,R=600+STEP;
+  return `<svg viewBox="-120 0 1440 250" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <rect x="-400" y="226" width="2000" height="40" fill="#9CCB7A"/>
+    <path d="M600 60 V236" stroke="#1D3528" stroke-width="4" stroke-dasharray="8 8"/>
+    <path d="M${L} 204 V228 M${R} 204 V228" stroke="#FBFDF7" stroke-width="8" stroke-linecap="round"/>
+    <text x="${L}" y="245" text-anchor="middle" font-family="Andika,sans-serif" font-weight="700" font-size="16" fill="#1D3528">garis menang ${esc(G.names[0])}</text>
+    <text x="${R}" y="245" text-anchor="middle" font-family="Andika,sans-serif" font-weight="700" font-size="16" fill="#1D3528">garis menang ${esc(G.names[1])}</text>
+    <g class="pull" id="pull">
+      <path d="M100 150 H1100" stroke="#A97C45" stroke-width="10" stroke-linecap="round"/>
+      <path d="M100 150 H1100" stroke="#7E5A2E" stroke-width="10" stroke-dasharray="4 10" opacity=".6"/>
+      <g id="teamA">${person(250,'#E8742A',1)}${person(350,'#E8742A',1)}</g>
+      <g id="teamB">${person(950,'#2A74C9',-1)}${person(850,'#2A74C9',-1)}</g>
+      <path d="M600 146 L588 190 L612 190Z" fill="#D2433A"/>
+      <circle cx="600" cy="150" r="9" fill="#D2433A"/>
+    </g>
+  </svg>`;
+}
+
+function start(){
+  G.pos=0;G.right=[0,0];G.wrong=[0,0];G.missed=[[],[]];G.over=false;G.n=[0,0];G.lock=[false,false];
+  G.deck=[shuffle(BANK),shuffle(BANK)];
+  app.innerHTML=`<header class="top">
+      <div class="ttl"><small>Siklus hidup hewan</small>Tarik Tambang</div>
+      <div class="timer" id="timer"></div>
+      <div class="tools"><button class="ic" id="snd" type="button">${G.sound?'Suara: nyala':'Suara: mati'}</button><button class="ic" id="fs" type="button">Layar penuh</button><button class="ic" id="menu" type="button">Menu</button></div>
+    </header>
+    <div class="scene">${scene()}<div class="steps" id="steps"></div></div>
+    <div class="halves"><section class="side a" id="s0"></section><section class="side b" id="s1"></section></div>`;
+  $('#snd').onclick=()=>{G.sound=!G.sound;$('#snd').textContent=G.sound?'Suara: nyala':'Suara: mati'};
+  $('#fs').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{})}catch(e){}};
+  $('#menu').onclick=intro;
+  next(0);next(1);rope(null);
+  clearInterval(tick);G.left=G.time;timer();
+  if(G.time)tick=setInterval(()=>{G.left--;timer();if(G.left<=5&&G.left>0)sfx.tick();if(G.left<=0)finish(G.pos<0?0:G.pos>0?1:null)},1000);
+}
+function timer(){const t=$('#timer');if(!t)return;if(!G.time){t.textContent='';return}const l=Math.max(0,G.left);t.textContent=`${Math.floor(l/60)}:${String(l%60).padStart(2,'0')}`;t.classList.toggle('low',l<=15)}
+
+function next(t){
+  if(!G.deck[t].length)G.deck[t]=shuffle(BANK);
+  const q=G.deck[t].pop();
+  G.cur[t]={...q,opts:shuffle(q.a),ans:q.a[0]};G.n[t]++;G.lock[t]=false;
+  side(t);
+}
+function side(t){
+  const s=$('#s'+t),q=G.cur[t];if(!s)return;
+  s.innerHTML=`<div class="shead"><span class="nm">${esc(G.names[t])}</span><span class="st">Benar ${G.right[t]} · Salah ${G.wrong[t]}</span></div>
+    <div class="qbox">${q.img?`<div class="qimg">${ART[q.img]}</div>`:''}<div class="qt"><small>Soal ${G.n[t]}</small>${esc(q.q)}</div></div>
+    <div class="choices">${q.opts.map((o,i)=>`<button class="opt" type="button" data-t="${t}" data-i="${i}"><span class="k">${'ABCD'[i]}</span><span class="tx">${esc(o)}</span></button>`).join('')}</div>`;
+  s.querySelectorAll('.opt').forEach(b=>{
+    b.addEventListener('pointerdown',e=>{e.preventDefault();answer(t,+b.dataset.i)});
+    b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();answer(t,+b.dataset.i)}});
+  });
+}
+function answer(t,i){
+  if(G.over||G.lock[t])return;G.lock[t]=true;
+  const q=G.cur[t],s=$('#s'+t),btns=[...s.querySelectorAll('.opt')];
+  const ok=q.opts[i]===q.ans;
+  btns.forEach((b,j)=>{if(q.opts[j]===q.ans)b.classList.add('right');else if(j===i)b.classList.add('wrong');else b.classList.add('dim')});
+  if(ok){
+    G.right[t]++;G.pos+=t?1:-1;sfx.ok();toast(s,'Tarik!','ok');rope(t);
+    if(Math.abs(G.pos)>=G.target){setTimeout(()=>finish(t),700);return}
+    setTimeout(()=>next(t),900);
+  }else{
+    G.wrong[t]++;G.missed[t].push(q.q);sfx.bad();toast(s,'Belum tepat','no');
+    setTimeout(()=>next(t),2000);
+  }
+  s.querySelector('.st').textContent=`Benar ${G.right[t]} · Salah ${G.wrong[t]}`;
+}
+function toast(s,txt,c){const d=document.createElement('div');d.className='toast '+c;d.textContent=txt;s.appendChild(d);setTimeout(()=>d.remove(),c==='ok'?800:1300)}
+function rope(t){
+  const p=$('#pull');if(!p)return;
+  p.style.transform=`translateX(${G.pos*STEP/G.target}px)`;
+  const A=$('#teamA'),B=$('#teamB');
+  if(t!==null&&!G.over){const w=t?B:A,l=t?A:B;[w,l].forEach(g=>g.classList.remove('heave','slip'));void w.getBBox();w.classList.add('heave');l.classList.add('slip');setTimeout(()=>{w.classList.remove('heave');l.classList.remove('slip')},650)}
+  const st=$('#steps');if(st){let h='';for(let k=-G.target;k<=G.target;k++){let c='';if(k===0)c='c';else if(k<0&&G.pos<=k)c='a';else if(k>0&&G.pos>=k)c='b';h+=`<i class="${c}"></i>`}st.innerHTML=h}
+}
+function finish(w){
+  if(G.over)return;G.over=true;clearInterval(tick);
+  const A=$('#teamA'),B=$('#teamB');
+  if(w!==null){(w?B:A).classList.add('cheer');(w?A:B).classList.add('fall');sfx.win()}
+  const title=w===null?'Seri! Tali tetap di tengah':`${esc(G.names[w])} menang!`;
+  setTimeout(()=>{
+    document.body.insertAdjacentHTML('beforeend',`<div class="ov"><div class="ovbox">
+      <h2 style="color:${w===null?'var(--ink)':w?'var(--teamB-deep)':'var(--teamA-deep)'}">${title}</h2>
+      <div class="ovstats">${[0,1].map(t=>`<div class="${t?'b':'a'}"><b>${esc(G.names[t])}</b><span>Benar ${G.right[t]} · Salah ${G.wrong[t]}</span></div>`).join('')}</div>
+      <div class="row"><button class="big" id="again" type="button">Main lagi</button><button class="btn" id="back" type="button">Ganti pengaturan</button></div>
+    </div></div>`);
+    $('#again').onclick=()=>{document.querySelector('.ov').remove();start()};
+    $('#back').onclick=intro;
+  },1400);
+}
+intro();
+</script>
+
+</html>
