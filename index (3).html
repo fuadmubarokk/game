@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Game Pembelajaran</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Andika:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#DDEFE3;
+  --paper:#FBFDF7;
+  --ink:#1D3528;
+  --muted:#557261;
+  --line:#B9D6C3;
+  --sun:#FFC93C;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Andika","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:clamp(15px,1.2vmin + 8px,22px);-webkit-user-select:none;user-select:none;touch-action:manipulation}
+button,a{font-family:var(--display);font-weight:800;color:inherit}
+button{cursor:pointer;border:0}
+button:focus-visible,a:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
+.app{max-width:1700px;margin:0 auto;padding:clamp(16px,3vmin,40px) 16px 40px;display:flex;flex-direction:column;gap:clamp(14px,2.4vmin,28px)}
+.top{position:relative;text-align:center;padding-top:8px}
+.top h1{padding-inline:clamp(0px,8vw,140px);font-family:var(--display);font-size:clamp(34px,6vmin,84px);line-height:.95;margin:0}
+.top h1 span{color:#E8742A}
+.top h1 span+span{color:#2A74C9}
+.top p{margin:6px 0 0;color:var(--muted)}
+.tools{position:absolute;top:0;right:0}
+.ic{background:var(--paper);border-radius:12px;padding:8px 14px;font-size:.8em;color:var(--muted)}
+.bar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:center}
+.field{display:flex;align-items:center;gap:8px;background:var(--paper);border:3px solid var(--line);border-radius:999px;padding:4px 6px 4px 16px;min-width:0}
+.field:focus-within{border-color:var(--ink)}
+.field label{font-weight:700;color:var(--muted);font-size:.85em;white-space:nowrap}
+.field input::placeholder{font-family:var(--body);font-weight:400;color:var(--muted)}
+.field select,.field input{font:inherit;font-family:var(--display);font-weight:800;color:var(--ink);background:transparent;border:0;outline:0;padding:8px 10px;min-width:0}
+.field select{cursor:pointer;padding-right:4px}
+.search{flex:1 1 320px;max-width:560px}
+.search input{flex:1;width:100%}
+.search svg{flex:none;width:22px;height:22px}
+.clear{flex:none;background:var(--bg);border-radius:999px;width:34px;height:34px;font-size:.9em;color:var(--muted)}
+.count{color:var(--muted);font-weight:700;width:100%;text-align:center;font-size:.85em}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),400px));justify-content:center;gap:clamp(14px,2vmin,24px)}
+.card{background:var(--paper);border-radius:26px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 6px 0 var(--line);text-decoration:none;transition:transform .12s,box-shadow .12s;border-top:10px solid var(--c)}
+.card:hover{transform:translateY(-3px);box-shadow:0 9px 0 var(--line)}
+.card:active{transform:translateY(4px);box-shadow:0 2px 0 var(--line)}
+.thumb{aspect-ratio:16/8;background:var(--soft);display:grid;place-items:center}
+.thumb svg{width:100%;height:100%}
+.info{padding:clamp(14px,2vmin,22px);display:flex;flex-direction:column;gap:8px;flex:1}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-family:var(--body);font-weight:700;font-size:.7em;padding:3px 10px;border-radius:999px;background:var(--soft);color:var(--deep)}
+.tag.k{background:var(--bg);color:var(--muted)}
+.card h2{font-family:var(--display);font-size:clamp(24px,3.2vmin,40px);line-height:1;margin:2px 0 0;color:var(--deep)}
+.card p{margin:0;color:var(--muted);font-family:var(--body);font-weight:400;line-height:1.35}
+.play{margin-top:auto;align-self:flex-start;background:var(--sun);border-radius:999px;padding:.35em 1.3em;font-size:1.05em;box-shadow:0 5px 0 #D9A21C;color:var(--ink)}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <h1>Game <span>Pembe</span><span>lajaran</span></h1>
+    <p>Pilih game, lalu ketuk Main. Setiap game dimainkan dua kelompok di IFP.</p>
+    <div class="tools"><button class="ic" id="fs" type="button">Layar penuh</button></div>
+  </header>
+  <div class="bar">
+    <div class="field"><label for="mapel">Mapel</label><select id="mapel"></select></div>
+    <div class="field search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="#557261" stroke-width="2.6"/><path d="M15.5 15.5 L21 21" stroke="#557261" stroke-width="2.6" stroke-linecap="round"/></svg><input id="cari" type="search" placeholder="Cari judul atau materi…" aria-label="Cari game" autocomplete="off"><button class="clear" id="hapus" type="button" aria-label="Hapus pencarian" hidden>✕</button></div>
+    <span class="count" id="count"></span>
+  </div>
+  <main class="grid" id="grid"></main>
+</div>
+
+<script>
+const GAMES=[
+  {file:'tarik-tambang-siklus-.html',judul:'Tarik Tambang Siklus',mapel:'IPAS',kelas:'Kelas III',materi:'Siklus Hidup Hewan',ket:'Jawab soal siklus hidup hewan dengan benar untuk menarik tali ke arah kelompokmu.',warna:'#E8742A',lembut:'#FDE3D0',tua:'#B9531B',ikon:'tambang'},
+  {file:'balap-karung-perkalian.html',judul:'Balap Karung Perkalian',mapel:'Matematika',kelas:'Kelas III',materi:'Perkalian sebagai Penjumlahan Berulang',ket:'Jawab soal perkalian 1 sampai 5 dengan benar agar pelari karung kelompokmu melompat ke garis finis.',warna:'#2A74C9',lembut:'#D6E6F8',tua:'#1B5496',ikon:'karung'},
+];
+
+const kid=(x,shirt,dir)=>`<g transform="translate(${x} 0) scale(${dir} 1)"><g transform="rotate(-10 0 150)">
+  <path d="M0 118 L-16 150 M0 118 L14 150" stroke="#2B3A32" stroke-width="8" stroke-linecap="round"/>
+  <path d="M0 120 L-4 82" stroke="${shirt}" stroke-width="22" stroke-linecap="round"/>
+  <path d="M-2 90 Q12 98 30 104" stroke="#E9B98E" stroke-width="7" stroke-linecap="round" fill="none"/>
+  <circle cx="-6" cy="64" r="13" fill="#E9B98E"/>
+  <path d="M-19 61 Q-18 48 -5 49 Q7 49 7 60 Q-3 55 -19 61Z" fill="#2B2320"/></g></g>`;
+const sack=(x,y,shirt)=>`<g transform="translate(${x} ${y}) scale(.68)">
+  <ellipse cx="0" cy="2" rx="26" ry="5" fill="#1D3528" opacity=".18"/>
+  <path d="M-12 -66 Q0 -72 12 -66 L14 -40 L-14 -40Z" fill="${shirt}"/>
+  <path d="M-22 0 L-26 -46 Q0 -54 26 -46 L22 0 Q0 4 -22 0Z" fill="#C9A46A" stroke="#8A6A3A" stroke-width="3"/>
+  <path d="M-20 -34 L20 -34 M-21 -22 L21 -22 M-21 -10 L21 -10 M-10 -48 L-9 0 M8 -49 L8 0" stroke="#A88553" stroke-width="2" opacity=".7"/>
+  <path d="M-11 -62 Q-22 -56 -22 -45 M11 -62 Q22 -56 22 -45" stroke="#E9B98E" stroke-width="7" stroke-linecap="round" fill="none"/>
+  <circle cx="1" cy="-82" r="14" fill="#E9B98E"/>
+  <path d="M-14 -86 Q-12 -100 2 -99 Q16 -98 15 -86 Q4 -92 -14 -86Z" fill="#2B2320"/>
+  <circle cx="7" cy="-82" r="2.4" fill="#2B2320"/></g>`;
+const ART={
+  tambang:()=>`<svg viewBox="0 0 320 160" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <rect width="160" height="160" fill="#FDE3D0"/><rect x="160" width="160" height="160" fill="#D6E6F8"/>
+    <rect y="148" width="320" height="12" fill="#9CCB7A"/>
+    <path d="M160 40 V150" stroke="#1D3528" stroke-width="3" stroke-dasharray="6 6"/>
+    <path d="M30 104 H290" stroke="#A97C45" stroke-width="7" stroke-linecap="round"/>
+    ${kid(60,'#E8742A',1)}${kid(110,'#E8742A',1)}${kid(260,'#2A74C9',-1)}${kid(210,'#2A74C9',-1)}
+    <path d="M150 100 L142 128 L158 128Z" fill="#D2433A"/><circle cx="150" cy="104" r="6" fill="#D2433A"/></svg>`,
+  karung:()=>`<svg viewBox="0 0 320 160" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <rect width="320" height="160" fill="#9CCB7A"/>
+    <rect y="4" width="320" height="74" fill="#FDE3D0" opacity=".6"/><rect y="82" width="320" height="74" fill="#D6E6F8" opacity=".7"/>
+    <path d="M0 80 H320" stroke="#FBFDF7" stroke-width="3"/>
+    ${Array.from({length:10},(_,i)=>`<rect x="282" y="${4+i*15.2}" width="8" height="15.2" fill="${i%2?'#1D3528':'#FBFDF7'}"/><rect x="290" y="${4+i*15.2}" width="8" height="15.2" fill="${i%2?'#FBFDF7':'#1D3528'}"/>`).join('')}
+    ${sack(190,74,'#E8742A')}${sack(120,152,'#2A74C9')}</svg>`,
+  umum:(g)=>`<svg viewBox="0 0 320 160" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <rect width="320" height="160" fill="${g.lembut}"/>
+    <circle cx="160" cy="80" r="46" fill="${g.warna}"/>
+    <path d="M160 52 L168 72 L190 74 L173 88 L178 110 L160 98 L142 110 L147 88 L130 74 L152 72Z" fill="#FFC93C"/></svg>`,
+};
+
+const $=(s)=>document.querySelector(s);
+const esc=(t)=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let pilih='Semua';
+try{pilih=localStorage.getItem('mapel-game')||'Semua'}catch(e){}
+
+const norm=(t)=>String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+function render(){
+  const mapel=['Semua',...new Set(GAMES.map(g=>g.mapel))];
+  if(!mapel.includes(pilih))pilih='Semua';
+  const sel=$('#mapel');
+  sel.innerHTML=mapel.map(m=>`<option value="${esc(m)}"${m===pilih?' selected':''}>${m==='Semua'?'Semua mapel':esc(m)}</option>`).join('');
+  const kata=norm($('#cari').value.trim()).split(/\s+/).filter(Boolean);
+  $('#hapus').hidden=!kata.length;
+  const list=GAMES.filter(g=>(pilih==='Semua'||g.mapel===pilih)&&kata.every(k=>norm([g.judul,g.mapel,g.kelas,g.materi,g.ket].join(' ')).includes(k)));
+  $('#count').textContent=`${list.length} dari ${GAMES.length} game`;
+  $('#grid').innerHTML=list.length?list.map(g=>`<a class="card" href="${encodeURI(g.file)}" style="--c:${g.warna};--soft:${g.lembut};--deep:${g.tua}">
+      <div class="thumb">${(ART[g.ikon]||ART.umum)(g)}</div>
+      <div class="info">
+        <div class="tags"><span class="tag">${esc(g.mapel)}</span><span class="tag k">${esc(g.kelas)}</span></div>
+        <h2>${esc(g.judul)}</h2>
+        <p><b>${esc(g.materi)}</b></p>
+        <p>${esc(g.ket)}</p>
+        <span class="play">Main</span>
+      </div></a>`).join(''):`<div class="empty">Game tidak ditemukan. Coba kata lain atau pilih Semua mapel.</div>`;
+}
+$('#mapel').addEventListener('change',e=>{pilih=e.target.value;try{localStorage.setItem('mapel-game',pilih)}catch(err){}render()});
+$('#cari').addEventListener('input',render);
+$('#hapus').onclick=()=>{$('#cari').value='';render();$('#cari').focus()};
+$('#fs').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{})}catch(e){}};
+render();
+</script>
+</body>
+</html>
