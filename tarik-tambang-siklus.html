@@ -233,7 +233,7 @@ function intro(){
         <div class="seg" data-k="target">${[[3,'3 langkah'],[5,'5 langkah'],[7,'7 langkah']].map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${G.target===v}">${l}</button>`).join('')}</div></div>
       <div class="opts-row"><span class="optlabel">Waktu</span>
         <div class="seg" data-k="time">${[[0,'Tanpa'],[120,'2 menit'],[180,'3 menit'],[300,'5 menit']].map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${G.time===v}">${l}</button>`).join('')}</div></div>
-      <div><button class="big" id="go" type="button">Mulai tarik!</button></div>
+      <div class="row"><button class="big" id="go" type="button">Mulai tarik!</button><a class="btn" href="index.html" style="text-decoration:none;display:inline-flex;align-items:center;color:var(--ink);font-family:var(--display);font-weight:800">Daftar game</a></div>
       <div class="hint">Menang jika tali tertarik sampai garis timmu. Jika waktu habis, tim yang tali ada di sisinya menang.</div>
     </div>
   </section>`;
