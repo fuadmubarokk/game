@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menangkap Nyamuk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Andika:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#DDEFE3;
+  --paper:#FBFDF7;
+  --ink:#1D3528;
+  --muted:#557261;
+  --line:#B9D6C3;
+  --sun:#FFC93C;
+  --teamA:#E8742A;
+  --teamA-soft:#FDE3D0;
+  --teamA-deep:#B9531B;
+  --teamB:#2A74C9;
+  --teamB-soft:#D6E6F8;
+  --teamB-deep:#1B5496;
+  --ok:#2E9E5B;
+  --ok-soft:#D4F1DF;
+  --bad:#D2433A;
+  --bad-soft:#FADAD7;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Andika","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:clamp(14px,1.5vmin + 6px,22px);overflow:hidden;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+button,a.btn{font-family:var(--display);font-weight:800;cursor:pointer;border:0;color:inherit}
+button:focus-visible,a:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
+
+.intro{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;overflow:auto;padding:16px;z-index:20;background:var(--bg)}
+.intro h1{font-family:var(--display);font-size:clamp(38px,7.5vmin,100px);line-height:.95;margin:0}
+.intro h1 .a{color:var(--teamA)}
+.intro h1 .b{color:var(--teamB)}
+.intro p{max-width:40em;margin:0;color:var(--muted);text-wrap:balance}
+.setup{background:var(--paper);border-radius:28px;padding:clamp(16px,3vmin,34px);display:grid;gap:16px;width:min(100%,900px);box-shadow:0 6px 0 var(--line)}
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.teams label{display:grid;gap:6px;text-align:left;font-weight:700}
+.teams input{font:inherit;font-family:var(--display);font-weight:800;font-size:1.2em;padding:10px 14px;border-radius:14px;border:3px solid var(--teamA);background:#fff;color:var(--ink);min-width:0}
+.teams label:last-child input{border-color:var(--teamB)}
+.opts-row{display:flex;flex-wrap:wrap;gap:10px 16px;justify-content:center;align-items:center}
+.optlabel{font-weight:700;color:var(--muted)}
+.seg{display:flex;background:var(--bg);border-radius:999px;padding:4px;gap:4px;flex-wrap:wrap;justify-content:center}
+.seg button{padding:8px 16px;border-radius:999px;background:transparent;font-size:.95em}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.big{font-size:clamp(22px,3.2vmin,40px);padding:.45em 1.4em;border-radius:999px;background:var(--sun);box-shadow:0 6px 0 #D9A21C}
+.big:active{transform:translateY(4px);box-shadow:0 2px 0 #D9A21C}
+.btn{font-size:1.1em;padding:.5em 1.3em;border-radius:999px;background:var(--paper);box-shadow:0 5px 0 var(--line);border:2px solid var(--line);text-decoration:none;display:inline-flex;align-items:center;color:var(--ink)}
+.row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;align-items:center}
+.hint{color:var(--muted);font-size:.9em}
+.msg{color:var(--bad);font-weight:700}
+
+.stage{position:fixed;inset:0;overflow:hidden;background:linear-gradient(#8FCBEF,#CDEBD8 70%,#9CCB7A)}
+.stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.stage .shade{position:absolute;inset:0;background:rgba(29,53,40,.12);pointer-events:none}
+.mid{position:absolute;top:0;bottom:0;left:50%;width:0;border-left:6px dashed rgba(251,253,247,.9);transform:translateX(-3px);pointer-events:none;filter:drop-shadow(0 0 3px rgba(0,0,0,.35))}
+.qcard{position:absolute;top:clamp(8px,1.6vh,18px);left:50%;transform:translateX(-50%);width:min(56vw,900px);background:var(--paper);border-radius:22px;padding:clamp(8px,1.4vh,14px) clamp(12px,2vw,24px) clamp(10px,1.6vh,16px);text-align:center;box-shadow:0 6px 0 rgba(29,53,40,.25);z-index:5}
+.qcard small{display:block;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;font-size:clamp(11px,1.4vmin,16px)}
+.qcard .qt{font-family:var(--display);font-weight:800;font-size:clamp(18px,3.6vmin,44px);line-height:1.12;text-wrap:balance}
+.tbar{height:8px;border-radius:999px;background:var(--bg);margin-top:8px;overflow:hidden}
+.tbar i{display:block;height:100%;width:100%;background:var(--ok);transform-origin:left;border-radius:999px}
+.tbar i.low{background:var(--bad)}
+.score{position:absolute;top:clamp(8px,1.6vh,18px);z-index:5;background:var(--paper);border-radius:20px;padding:8px 16px;min-width:clamp(120px,15vw,220px);box-shadow:0 5px 0 rgba(29,53,40,.25);border-top:8px solid var(--teamA)}
+.score.a{left:clamp(8px,1.4vw,18px)}
+.score.b{right:clamp(8px,1.4vw,18px);border-top-color:var(--teamB);text-align:right}
+.score .nm{font-family:var(--display);font-weight:800;font-size:clamp(16px,2.4vmin,30px);line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:20vw}
+.score.a .nm{color:var(--teamA-deep)}
+.score.b .nm{color:var(--teamB-deep)}
+.score .pt{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vmin,76px);line-height:1;font-variant-numeric:tabular-nums}
+.score .st{font-weight:700;color:var(--muted);font-size:clamp(11px,1.5vmin,17px);white-space:nowrap}
+.side-label{position:absolute;bottom:clamp(8px,1.6vh,16px);z-index:5;font-family:var(--display);font-weight:800;color:#fff;padding:4px 16px;border-radius:999px;font-size:clamp(13px,1.8vmin,22px)}
+.side-label.a{left:clamp(8px,1.4vw,18px);background:var(--teamA)}
+.side-label.b{right:clamp(8px,1.4vw,18px);background:var(--teamB)}
+.tools{position:absolute;bottom:clamp(8px,1.6vh,16px);left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:6}
+.ic{background:var(--paper);border-radius:12px;padding:6px 12px;font-size:.75em;color:var(--muted)}
+
+.mq{position:absolute;left:0;top:0;width:var(--s);height:calc(var(--s)*1.3);margin-left:calc(var(--s)*-.5);margin-top:calc(var(--s)*-.55);display:flex;flex-direction:column;align-items:center;z-index:3;will-change:transform;pointer-events:none}
+.touch .mq{pointer-events:auto;cursor:pointer}
+.mq svg{width:var(--s);height:calc(var(--s)*.8);overflow:visible;filter:drop-shadow(0 3px 2px rgba(0,0,0,.3))}
+.mq .wing{transform-box:fill-box;transform-origin:50% 100%;animation:flap .09s linear infinite alternate}
+@keyframes flap{from{transform:scaleY(1)}to{transform:scaleY(.35)}}
+.mq .lb{margin-top:-4px;font-family:var(--display);font-weight:800;font-size:calc(var(--s)*.2);line-height:1.05;background:var(--paper);border:3px solid var(--teamA);border-radius:12px;padding:3px 9px;white-space:nowrap;max-width:calc(var(--s)*2.6);text-align:center;box-shadow:0 3px 0 rgba(29,53,40,.25);position:relative}
+.mq.b .lb{border-color:var(--teamB)}
+.mq .ring{position:absolute;left:50%;top:40%;width:calc(var(--s)*1.15);height:calc(var(--s)*1.15);transform:translate(-50%,-50%);border-radius:50%;background:conic-gradient(var(--sun) calc(var(--p,0)*1turn),transparent 0);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 8px));mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 8px));opacity:0;transition:opacity .15s}
+.mq.hover .ring{opacity:1}
+.mq.right .lb{background:var(--ok-soft);border-color:var(--ok)}
+.mq.wrong{animation:splat .6s forwards}
+.mq.wrong .lb{background:var(--bad-soft);border-color:var(--bad)}
+.mq.gone{animation:fade .5s forwards}
+@keyframes splat{0%{opacity:1}30%{opacity:1;filter:none}100%{opacity:0;filter:grayscale(1)}}
+@keyframes fade{to{opacity:0}}
+
+.hand{position:absolute;left:0;top:0;width:clamp(34px,5vmin,64px);height:clamp(34px,5vmin,64px);margin:calc(clamp(34px,5vmin,64px)/-2) 0 0 calc(clamp(34px,5vmin,64px)/-2);border-radius:50%;border:5px solid #fff;background:rgba(232,116,42,.55);z-index:4;pointer-events:none;box-shadow:0 0 0 3px rgba(29,53,40,.35);transition:opacity .15s}
+.hand.b{background:rgba(42,116,201,.55)}
+.hand[hidden]{display:none}
+
+.pop{position:absolute;transform:translate(-50%,-50%);font-family:var(--display);font-weight:800;font-size:clamp(34px,7vmin,90px);line-height:1;pointer-events:none;z-index:7;animation:up 1s forwards;text-shadow:0 3px 0 rgba(0,0,0,.25)}
+.pop.ok{color:#fff;-webkit-text-stroke:2px var(--ok)}
+.pop.no{color:#fff;-webkit-text-stroke:2px var(--bad)}
+@keyframes up{0%{opacity:0;margin-top:20px;scale:.6}20%{opacity:1;margin-top:0;scale:1}100%{opacity:0;margin-top:-70px}}
+.banner{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--paper);border-radius:24px;padding:14px 28px;font-family:var(--display);font-weight:800;font-size:clamp(22px,4vmin,48px);text-align:center;z-index:8;box-shadow:0 6px 0 rgba(29,53,40,.3);max-width:80vw}
+.banner small{display:block;font-family:var(--body);font-weight:700;color:var(--muted);font-size:.45em}
+
+.loading{position:absolute;inset:0;display:grid;place-items:center;z-index:9;background:rgba(221,239,227,.92);text-align:center;padding:16px}
+.loading .box{background:var(--paper);border-radius:28px;padding:clamp(18px,3vmin,34px);display:grid;gap:12px;max-width:640px;box-shadow:0 6px 0 var(--line)}
+.loading h2{font-family:var(--display);margin:0;font-size:clamp(24px,4vmin,44px);line-height:1}
+.spin{width:54px;height:54px;border-radius:50%;border:7px solid var(--line);border-top-color:var(--teamB);margin:0 auto;animation:rot 1s linear infinite}
+@keyframes rot{to{transform:rotate(1turn)}}
+
+.ov{position:fixed;inset:0;background:rgba(29,53,40,.5);display:grid;place-items:center;z-index:40;padding:16px}
+.ovbox{background:var(--paper);border-radius:28px;padding:clamp(18px,3vmin,36px);width:min(100%,820px);display:grid;gap:14px;text-align:center;animation:popbox .4s}
+.ovbox h2{font-family:var(--display);font-size:clamp(30px,6vmin,72px);line-height:1;margin:0}
+.ovstats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ovstats div{border-radius:18px;padding:12px;display:grid;gap:2px}
+.ovstats .a{background:var(--teamA-soft)}
+.ovstats .b{background:var(--teamB-soft)}
+.ovstats b{font-family:var(--display);font-size:1.3em}
+.ovstats strong{font-family:var(--display);font-size:2.2em;line-height:1}
+.ovstats span{color:var(--muted);font-weight:700;font-size:.9em}
+@keyframes popbox{from{transform:scale(.9);opacity:.3}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.mq .wing{animation:none}}
+@media (max-width:760px){.teams{grid-template-columns:1fr}.qcard{width:62vw}}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <video id="cam" playsinline muted></video>
+  <div class="shade"></div>
+  <div class="mid"></div>
+  <div id="fx"></div>
+  <div class="hand" id="h0" hidden></div>
+  <div class="hand" id="h1" hidden></div>
+  <div class="hand b" id="h2" hidden></div>
+  <div class="hand b" id="h3" hidden></div>
+</div>
+<div id="ui"></div>
+
+<script>
+const BANK=[
+{q:'Hewan yang aktif pada siang hari disebut hewan ...',a:['diurnal','nokturnal','amfibi','serangga']},
+{q:'Hewan yang aktif pada malam hari disebut hewan ...',a:['nokturnal','diurnal','amfibi','serangga']},
+{q:'Hewan diurnal mencari makan pada ...',a:['siang hari','malam hari','tengah malam','saat gelap']},
+{q:'Hewan nokturnal mencari makan pada ...',a:['malam hari','siang hari','pagi hari','saat cerah']},
+{q:'Manakah yang termasuk hewan diurnal?',a:['bebek','kelelawar','burung hantu','wijaya kusuma']},
+{q:'Manakah yang termasuk hewan diurnal?',a:['kambing','kelelawar','burung hantu','wijaya kusuma']},
+{q:'Manakah yang termasuk hewan nokturnal?',a:['kelelawar','bebek','kambing','ayam']},
+{q:'Manakah yang termasuk hewan nokturnal?',a:['burung hantu','bebek','kambing','ayam']},
+{q:'Kelelawar mencari makan pada ...',a:['malam hari','siang hari','pagi hari','saat cerah']},
+{q:'Bebek mencari makan pada ...',a:['siang hari','malam hari','tengah malam','saat gelap']},
+{q:'Burung hantu termasuk hewan ...',a:['nokturnal','diurnal','amfibi','tumbuhan']},
+{q:'Kambing termasuk hewan ...',a:['diurnal','nokturnal','amfibi','tumbuhan']},
+{q:'Bebek dan kambing termasuk hewan ...',a:['diurnal','nokturnal','amfibi','serangga']},
+{q:'Kelelawar dan burung hantu termasuk hewan ...',a:['nokturnal','diurnal','amfibi','serangga']},
+{q:'Hewan diurnal beristirahat pada ...',a:['malam hari','siang hari','pagi hari','saat cerah']},
+{q:'Hewan nokturnal beristirahat pada ...',a:['siang hari','malam hari','tengah malam','saat gelap']},
+{q:'Tumbuhan berfotosintesis pada ...',a:['siang hari','malam hari','tengah malam','saat gelap']},
+{q:'Tumbuhan berfotosintesis ketika ada ...',a:['cahaya matahari','cahaya bulan','angin kencang','awan gelap']},
+{q:'Mengapa tumbuhan tidak berfotosintesis pada malam hari?',a:['tidak ada matahari','tidak ada hujan','udara ramai','tumbuhan lapar']},
+{q:'Bunga yang hanya mekar pada malam hari adalah ...',a:['wijaya kusuma','mawar','bunga matahari','kembang sepatu']},
+{q:'Bunga wijaya kusuma mekar pada ...',a:['malam hari','siang hari','pagi hari','saat cerah']},
+{q:'Wijaya kusuma termasuk ...',a:['tumbuhan','hewan diurnal','hewan nokturnal','cuaca']},
+{q:'Pergantian siang dan malam termasuk ...',a:['perubahan di alam','cuaca hujan','hewan nokturnal','fotosintesis']},
+{q:'Contoh perubahan di alam adalah perubahan ...',a:['cuaca','tinggi badan','warna baju','nama hari']},
+{q:'Keadaan udara di suatu tempat dalam waktu tertentu disebut ...',a:['cuaca','fotosintesis','siang hari','diurnal']},
+{q:'Cuaca dapat berubah-ubah ...',a:['setiap saat','setahun sekali','tidak pernah','hanya malam']},
+{q:'Langit biru, matahari terang, udara hangat. Cuaca apa ini?',a:['cerah','berawan','mendung','hujan']},
+{q:'Langit tertutup sebagian awan, matahari masih tampak. Cuaca apa ini?',a:['berawan','cerah','mendung','hujan']},
+{q:'Awan gelap dan tebal, cahaya matahari redup. Cuaca apa ini?',a:['mendung','cerah','berawan','hujan']},
+{q:'Air turun dari langit, udara lebih sejuk. Cuaca apa ini?',a:['hujan','cerah','berawan','mendung']},
+{q:'Saat cuaca cerah, udara terasa ...',a:['hangat','sangat dingin','basah','gelap']},
+{q:'Saat cuaca cerah, langit berwarna ...',a:['biru','gelap','abu-abu tua','hitam']},
+{q:'Saat cuaca mendung, cahaya matahari tampak ...',a:['redup','sangat terang','menyilaukan','berwarna biru']},
+{q:'Saat cuaca berawan, cahaya matahari ...',a:['masih tampak','hilang semua','berwarna merah','turun hujan']},
+{q:'Cuaca hujan ditandai dengan turunnya ...',a:['air hujan','daun kering','debu','cahaya']},
+{q:'Saat cuaca mendung, awan di langit berwarna ...',a:['gelap','putih bersih','biru muda','kuning']},
+{q:'Kegiatan yang cocok saat cuaca cerah adalah ...',a:['menjemur baju','memakai jas hujan','berteduh dari hujan','menampung air hujan']},
+{q:'Saat hujan turun, kita sebaiknya memakai ...',a:['payung','kacamata hitam','topi pantai','sandal jepit']},
+];
+
+const DWELL=650,COOL=700;
+const $=(s,r=document)=>r.querySelector(s);
+const ui=$('#ui'),stage=$('#stage'),fx=$('#fx'),video=$('#cam');
+const shuffle=(a)=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=(t)=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+let G={names:['Tim Jeruk','Tim Langit'],total:10,qtime:20,mode:'kamera',sound:true,score:[0,0],right:[0,0],wrong:[0,0],deck:[],qi:0,cur:null,mq:[],state:'idle',qStart:0,cool:[0,0],hands:[]};
+let audio=null,landmarker=null,stream=null,raf=0,lastVideoTime=-1,lastT=0;
+
+function beep(f,d=.12,type='sine',v=.15){if(!G.sound)return;try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();const o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(audio.destination);const t=audio.currentTime;g.gain.exponentialRampToValueAtTime(.001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
+const sfx={ok:()=>{beep(660,.1);setTimeout(()=>beep(990,.16),90)},bad:()=>beep(200,.25,'sawtooth',.07),win:()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.22),i*150)),tick:()=>beep(900,.05,'square',.04)};
+
+const MQSVG=`<svg viewBox="0 0 120 96" aria-hidden="true">
+  <ellipse class="wing" cx="44" cy="30" rx="26" ry="12" fill="#E6F4FB" fill-opacity=".85" stroke="#8FB7CB" stroke-width="2" transform="rotate(-28 44 30)"/>
+  <ellipse class="wing" cx="72" cy="28" rx="24" ry="11" fill="#E6F4FB" fill-opacity=".85" stroke="#8FB7CB" stroke-width="2" transform="rotate(22 72 28)"/>
+  <path d="M50 52 L36 74 L30 92 M58 54 L54 78 L56 94 M66 54 L72 76 L80 92 M48 50 L24 64 L12 70 M70 50 L92 62 L106 66" stroke="#2B2320" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  <path d="M54 48 Q76 44 100 58" stroke="#2B2320" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M70 47 L72 55 M80 48 L82 57 M90 52 L91 60" stroke="#F2F2F2" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="52" cy="48" rx="11" ry="9" fill="#3A302B"/>
+  <circle cx="40" cy="46" r="8" fill="#2B2320"/>
+  <circle cx="37" cy="44" r="3" fill="#fff"/><circle cx="36.5" cy="44.2" r="1.5" fill="#2B2320"/>
+  <path d="M33 48 L10 56" stroke="#2B2320" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M38 39 Q30 28 22 26 M42 39 Q40 28 34 22" stroke="#2B2320" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+</svg>`;
+
+function intro(msg){
+  stopAll();
+  ui.innerHTML=`<section class="intro">
+    <h1>Menangkap <span class="a">Nya</span><span class="b">muk</span></h1>
+    <p>Dua perwakilan kelompok berdiri di depan IFP, satu di kiri dan satu di kanan garis. Baca soal di atas, lalu tangkap nyamuk yang membawa jawaban benar dengan menahan tangan di atasnya. Benar +1, salah −1.</p>
+    <div class="setup">
+      <div class="teams">
+        <label for="nA">Kelompok kiri<input id="nA" maxlength="18" value="${esc(G.names[0])}"></label>
+        <label for="nB">Kelompok kanan<input id="nB" maxlength="18" value="${esc(G.names[1])}"></label>
+      </div>
+      <div class="opts-row"><span class="optlabel">Jumlah soal</span>
+        <div class="seg" data-k="total">${[[10,'10 soal'],[15,'15 soal'],[20,'20 soal']].map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${G.total===v}">${l}</button>`).join('')}</div></div>
+      <div class="opts-row"><span class="optlabel">Waktu per soal</span>
+        <div class="seg" data-k="qtime">${[[15,'15 detik'],[20,'20 detik'],[30,'30 detik'],[0,'Tanpa']].map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${G.qtime===v}">${l}</button>`).join('')}</div></div>
+      <div class="opts-row"><span class="optlabel">Cara main</span>
+        <div class="seg" data-k="mode">${[['kamera','Kamera (gerak tangan)'],['sentuh','Sentuh layar']].map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${G.mode===v}">${l}</button>`).join('')}</div></div>
+      ${msg?`<div class="msg">${esc(msg)}</div>`:''}
+      <div class="row"><button class="big" id="go" type="button">Mulai menangkap!</button><a class="btn" href="index.html">Daftar game</a></div>
+      <div class="hint">Nyamuk di sisi kiri hanya untuk kelompok kiri, nyamuk di sisi kanan untuk kelompok kanan. Jangan menyeberang garis tengah.</div>
+    </div>
+  </section>`;
+  ui.querySelectorAll('.seg').forEach(seg=>seg.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const v=b.dataset.v;G[seg.dataset.k]=isNaN(+v)?v:+v;seg.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b))}));
+  $('#go').onclick=()=>{G.names=[$('#nA').value.trim()||'Kelompok A',$('#nB').value.trim()||'Kelompok B'];prepare()};
+}
+
+function stopAll(){
+  cancelAnimationFrame(raf);raf=0;G.state='idle';
+  fx.innerHTML='';G.mq=[];hideHands();
+  document.querySelector('.ov')?.remove();
+  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
+  video.srcObject=null;stage.classList.remove('touch');
+}
+
+function loadingBox(title,text,spin){
+  ui.innerHTML=`<div class="loading"><div class="box">${spin?'<div class="spin"></div>':''}<h2>${esc(title)}</h2><p class="hint">${esc(text)}</p><div class="row" id="lrow"></div></div></div>`;
+}
+
+async function prepare(){
+  if(G.mode==='sentuh'){start();return}
+  loadingBox('Menyiapkan kamera…','Jika muncul pertanyaan izin kamera, pilih Izinkan.',true);
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:1280},height:{ideal:720}},audio:false});
+    video.srcObject=stream;await video.play();
+  }catch(e){
+    fail('Kamera tidak bisa dibuka. Pastikan izin kamera diberikan dan kamera tidak dipakai aplikasi lain.');return;
+  }
+  if(!landmarker){
+    loadingBox('Menyiapkan pembaca tangan…','Butuh internet. Pertama kali bisa beberapa detik.',true);
+    try{
+      const v=await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/vision_bundle.mjs');
+      const files=await v.FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/wasm');
+      const opts=(d)=>({baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',delegate:d},runningMode:'VIDEO',numHands:4,minHandDetectionConfidence:.5,minHandPresenceConfidence:.5,minTrackingConfidence:.5});
+      try{landmarker=await v.HandLandmarker.createFromOptions(files,opts('GPU'))}catch(err){landmarker=await v.HandLandmarker.createFromOptions(files,opts('CPU'))}
+    }catch(e){
+      fail('Pembaca tangan gagal dimuat. Periksa sambungan internet IFP.');return;
+    }
+  }
+  start();
+}
+function fail(text){
+  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
+  loadingBox('Belum bisa memakai kamera',text,false);
+  $('#lrow').innerHTML=`<button class="big" type="button" id="useTouch">Main dengan sentuh layar</button><button class="btn" type="button" id="back">Kembali</button>`;
+  $('#useTouch').onclick=()=>{G.mode='sentuh';start()};
+  $('#back').onclick=()=>intro();
+}
+
+function start(){
+  G.score=[0,0];G.right=[0,0];G.wrong=[0,0];G.qi=0;G.cool=[0,0];
+  G.deck=shuffle(BANK);while(G.deck.length<G.total)G.deck=G.deck.concat(shuffle(BANK));
+  stage.classList.toggle('touch',G.mode==='sentuh');
+  video.style.display=G.mode==='kamera'?'':'none';
+  ui.innerHTML=`<div class="score a"><div class="nm">${esc(G.names[0])}</div><div class="pt" id="p0">0</div><div class="st" id="t0">Benar 0 · Salah 0</div></div>
+    <div class="score b"><div class="nm">${esc(G.names[1])}</div><div class="pt" id="p1">0</div><div class="st" id="t1">Benar 0 · Salah 0</div></div>
+    <div class="qcard"><small id="qn"></small><div class="qt" id="qt"></div><div class="tbar"><i id="tb"></i></div></div>
+    <div class="side-label a">${esc(G.names[0])} di kiri</div><div class="side-label b">${esc(G.names[1])} di kanan</div>
+    <div class="tools"><button class="ic" id="snd" type="button">${G.sound?'Suara: nyala':'Suara: mati'}</button><button class="ic" id="fs" type="button">Layar penuh</button><button class="ic" id="menu" type="button">Menu</button></div>`;
+  $('#snd').onclick=()=>{G.sound=!G.sound;$('#snd').textContent=G.sound?'Suara: nyala':'Suara: mati'};
+  $('#fs').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{})}catch(e){}};
+  $('#menu').onclick=()=>intro();
+  lastT=performance.now();
+  nextQ();
+  cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);
+}
+
+function area(t){
+  const W=stage.clientWidth,H=stage.clientHeight;
+  const qc=$('.qcard'),top=(qc?qc.getBoundingClientRect().bottom:H*.2)+H*.08;
+  const pad=W*.015,bottom=H-H*.12;
+  return t?{x0:W/2+pad,x1:W-pad,y0:top,y1:bottom}:{x0:pad,x1:W/2-pad,y0:top,y1:bottom};
+}
+function mqSize(){return Math.max(60,Math.min(stage.clientWidth*.085,stage.clientHeight*.15))}
+
+function nextQ(){
+  fx.innerHTML='';G.mq=[];
+  if(G.qi>=G.total){finish();return}
+  const q=G.deck[G.qi];G.qi++;
+  G.cur={q:q.q,ans:q.a[0],opts:q.a};
+  $('#qn').textContent=`Soal ${G.qi} dari ${G.total}`;
+  $('#qt').textContent=q.q;
+  const s=mqSize();
+  [0,1].forEach(t=>{
+    const A=area(t),opts=shuffle(q.a),n=opts.length;
+    opts.forEach((o,i)=>{
+      const el=document.createElement('div');
+      el.className='mq '+(t?'b':'a');el.style.setProperty('--s',s+'px');
+      el.innerHTML=`<div class="ring"></div>${MQSVG}<div class="lb">${esc(o)}</div>`;
+      fx.appendChild(el);
+      const cols=2,rows=Math.ceil(n/cols),cx=A.x0+(A.x1-A.x0)*((i%cols)+.5)/cols,cy=A.y0+(A.y1-A.y0)*(Math.floor(i/cols)+.5)/rows;
+      const m={el,t,text:o,ok:o===q.a[0],x:cx+(Math.random()-.5)*s*.6,y:cy+(Math.random()-.5)*s*.4,ang:Math.random()*Math.PI*2,sp:s*(1.1+Math.random()*.5),ph:Math.random()*6,hold:0,alive:true};
+      m.hw=Math.max(s*.55,el.querySelector('.lb').offsetWidth/2+6);m.x=Math.min(A.x1-m.hw,Math.max(A.x0+m.hw,m.x));
+      el.addEventListener('pointerdown',e=>{e.preventDefault();if(G.mode==='sentuh')catchMq(m)});
+      G.mq.push(m);
+    });
+  });
+  G.state='play';G.qStart=performance.now();
+}
+
+function catchMq(m){
+  if(G.state!=='play'||!m.alive)return;
+  const now=performance.now(),t=m.t;
+  if(now<G.cool[t])return;
+  if(m.ok){
+    G.score[t]++;G.right[t]++;sfx.ok();
+    m.el.classList.add('right');pop(m.x,m.y-mqSize()*.6,'+1','ok');
+    G.state='reveal';
+    G.mq.forEach(o=>{if(o!==m){if(o.ok)o.el.classList.add('right');else o.el.classList.add('gone')}});
+    banner(`${esc(G.names[t])} benar!`,`Jawaban: ${esc(G.cur.ans)}`);
+    updScore();setTimeout(nextQ,1700);
+  }else{
+    G.score[t]--;G.wrong[t]++;sfx.bad();m.alive=false;
+    m.el.classList.add('wrong');pop(m.x,m.y-mqSize()*.6,'−1','no');
+    G.cool[t]=now+COOL;updScore();
+    setTimeout(()=>m.el.remove(),650);
+  }
+}
+function timeUp(){
+  G.state='reveal';
+  G.mq.forEach(o=>{if(o.ok)o.el.classList.add('right');else o.el.classList.add('gone')});
+  banner('Waktu habis',`Jawaban: ${esc(G.cur.ans)}`);
+  setTimeout(nextQ,2000);
+}
+function updScore(){[0,1].forEach(t=>{$('#p'+t).textContent=G.score[t];$('#t'+t).textContent=`Benar ${G.right[t]} · Salah ${G.wrong[t]}`})}
+function pop(x,y,txt,c){y=Math.max(y,area(0).y0);const d=document.createElement('div');d.className='pop '+c;d.textContent=txt;d.style.left=x+'px';d.style.top=y+'px';fx.appendChild(d);setTimeout(()=>d.remove(),1000)}
+function banner(t,s){const d=document.createElement('div');d.className='banner';d.innerHTML=`${t}<small>${s}</small>`;fx.appendChild(d)}
+
+function loop(now){
+  raf=requestAnimationFrame(loop);
+  const dt=Math.min(.05,(now-lastT)/1000);lastT=now;
+  if(G.state==='play'&&G.qtime){
+    const left=G.qtime-(now-G.qStart)/1000,tb=$('#tb');
+    if(tb){tb.style.transform=`scaleX(${Math.max(0,left/G.qtime)})`;tb.classList.toggle('low',left<=5)}
+    if(left<=0){timeUp()}
+  }else if(G.state==='play'){const tb=$('#tb');if(tb)tb.style.transform='scaleX(1)'}
+  move(dt,now);
+  if(G.mode==='kamera'&&landmarker&&video.readyState>=2&&video.currentTime!==lastVideoTime){
+    lastVideoTime=video.currentTime;
+    try{const r=landmarker.detectForVideo(video,now);handsFrom(r.landmarks||[])}catch(e){}
+  }
+  if(G.mode==='kamera')hover(dt);
+}
+
+function move(dt,now){
+  const s=mqSize();
+  for(const m of G.mq){
+    if(!m.alive)continue;
+    const A=area(m.t);
+    if(G.state==='play'){
+      const slow=m.hold>0?.25:1;
+      m.ang+=(Math.random()-.5)*2.4*dt;
+      m.x+=Math.cos(m.ang)*m.sp*dt*slow;m.y+=Math.sin(m.ang)*m.sp*.7*dt*slow;
+      for(const o of G.mq){if(o===m||!o.alive||o.t!==m.t)continue;const dx=m.x-o.x,dy=m.y-o.y,d=Math.hypot(dx,dy)||1;if(d<s*1.5){m.x+=dx/d*(s*1.5-d)*.08;m.y+=dy/d*(s*1.5-d)*.08}}
+      const lo=A.x0+(m.hw||0),hi=Math.max(lo,A.x1-(m.hw||0));
+      if(m.x<lo){m.x=lo;m.ang=Math.PI-m.ang}
+      if(m.x>hi){m.x=hi;m.ang=Math.PI-m.ang}
+      if(m.y<A.y0){m.y=A.y0;m.ang=-m.ang}
+      if(m.y>A.y1){m.y=A.y1;m.ang=-m.ang}
+    }
+    const bob=Math.sin(now/180+m.ph)*s*.05,flip=Math.cos(m.ang)<0?-1:1;
+    m.el.style.transform=`translate(${m.x}px,${m.y+bob}px)`;
+    m.el.querySelector('svg').style.transform=`scaleX(${flip})`;
+  }
+}
+
+function handsFrom(list){
+  const W=stage.clientWidth,H=stage.clientHeight,vw=video.videoWidth||1280,vh=video.videoHeight||720;
+  const sc=Math.max(W/vw,H/vh),dw=vw*sc,dh=vh*sc,ox=(W-dw)/2,oy=(H-dh)/2;
+  const map=(p)=>({x:ox+(1-p.x)*dw,y:oy+p.y*dh});
+  const hs=list.map(lm=>{
+    const pts=[0,5,9,13,17].map(i=>map(lm[i]));
+    const c={x:pts.reduce((a,p)=>a+p.x,0)/5,y:pts.reduce((a,p)=>a+p.y,0)/5};
+    const tip=map(lm[8]);
+    const size=Math.hypot(pts[0].x-pts[2].x,pts[0].y-pts[2].y);
+    return {x:(c.x*2+tip.x)/3,y:(c.y*2+tip.y)/3,size};
+  });
+  const out=[];
+  [0,1].forEach(t=>{
+    const mine=hs.filter(h=>t?h.x>=W/2:h.x<W/2);
+    const mx=Math.max(0,...mine.map(h=>h.size));
+    mine.filter(h=>h.size>=mx*.55&&h.size>=Math.min(W,H)*.03).sort((a,b)=>b.size-a.size).slice(0,2).forEach(h=>out.push({...h,t}));
+  });
+  G.hands=out;
+  drawHands();
+}
+function drawHands(){
+  const slots={0:[$('#h0'),$('#h1')],1:[$('#h2'),$('#h3')]},used={0:0,1:0};
+  for(const h of G.hands){const el=slots[h.t][used[h.t]++];if(!el)continue;el.hidden=false;el.style.transform=`translate(${h.x}px,${h.y}px)`}
+  [0,1].forEach(t=>slots[t].slice(used[t]).forEach(el=>el.hidden=true));
+}
+function hideHands(){['h0','h1','h2','h3'].forEach(id=>$('#'+id).hidden=true);G.hands=[]}
+
+function hover(dt){
+  const s=mqSize(),now=performance.now();
+  for(const m of G.mq){
+    if(!m.alive)continue;
+    const over=G.state==='play'&&now>=G.cool[m.t]&&G.hands.some(h=>h.t===m.t&&Math.hypot(h.x-m.x,h.y-(m.y+s*.1))<s*.75);
+    m.hold=over?m.hold+dt*1000:Math.max(0,m.hold-dt*2000);
+    m.el.classList.toggle('hover',m.hold>0);
+    m.el.style.setProperty('--p',Math.min(1,m.hold/DWELL));
+    if(m.hold>=DWELL){m.hold=0;catchMq(m)}
+  }
+}
+
+function finish(){
+  G.state='over';fx.innerHTML='';G.mq=[];sfx.win();
+  const w=G.score[0]===G.score[1]?null:G.score[0]>G.score[1]?0:1;
+  const title=w===null?'Seri!':`${esc(G.names[w])} menang!`;
+  document.body.insertAdjacentHTML('beforeend',`<div class="ov"><div class="ovbox">
+    <h2 style="color:${w===null?'var(--ink)':w?'var(--teamB-deep)':'var(--teamA-deep)'}">${title}</h2>
+    <div class="ovstats">${[0,1].map(t=>`<div class="${t?'b':'a'}"><b>${esc(G.names[t])}</b><strong>${G.score[t]}</strong><span>Benar ${G.right[t]} · Salah ${G.wrong[t]}</span></div>`).join('')}</div>
+    <div class="row"><button class="big" id="again" type="button">Main lagi</button><button class="btn" id="back" type="button">Ganti pengaturan</button></div>
+  </div></div>`);
+  $('#again').onclick=()=>{document.querySelector('.ov').remove();start()};
+  $('#back').onclick=()=>intro();
+}
+
+addEventListener('resize',()=>{for(const m of G.mq){const A=area(m.t);m.x=Math.min(A.x1-(m.hw||0),Math.max(A.x0+(m.hw||0),m.x));m.y=Math.min(A.y1,Math.max(A.y0,m.y))}});
+intro();
+</script>
+</body>
+</html>
