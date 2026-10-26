@@ -37,6 +37,10 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:4px solid var(-
 .intro h1 .b{color:var(--bad)}
 .intro p{max-width:42em;margin:0;color:var(--muted);text-wrap:balance}
 .setup{background:var(--paper);border-radius:28px;padding:clamp(16px,3vmin,32px);display:grid;gap:14px;width:min(100%,920px);box-shadow:0 6px 0 var(--line)}
+.pname{display:grid;gap:6px;text-align:left;font-weight:700}
+.pname input{font:inherit;font-family:var(--display);font-weight:800;font-size:1.2em;padding:10px 16px;border-radius:14px;border:3px solid var(--ok);background:#fff;color:var(--ink);min-width:0;-webkit-user-select:text;user-select:text}
+.who{position:absolute;top:calc(clamp(10px,1.8vh,20px) + clamp(72px,11vmin,140px) + 10px);left:clamp(10px,1.4vw,20px);z-index:6;background:var(--paper);border-radius:14px;padding:6px 14px;font-family:var(--display);font-weight:800;font-size:clamp(14px,2vmin,24px);max-width:16vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 4px 0 rgba(29,53,40,.25)}
+.who[hidden]{display:none}
 .topic{font-family:var(--display);font-weight:800;font-size:1.1em;color:var(--ink)}
 .topic small{display:block;font-family:var(--body);font-weight:700;color:var(--muted);font-size:.7em}
 .opts-row{display:flex;flex-wrap:wrap;gap:10px 16px;justify-content:center;align-items:center}
@@ -86,7 +90,8 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:4px solid var(-
 .ctrl{position:absolute;left:50%;bottom:clamp(12px,3vh,36px);transform:translateX(-50%);display:flex;gap:8px;z-index:6;flex-wrap:wrap;justify-content:center;max-width:20vw}
 .ctrl button{background:var(--ok);color:#fff;border-radius:999px;padding:.5em 1.2em;font-size:clamp(14px,1.8vmin,22px);box-shadow:0 4px 0 #1E6E3F}
 .ctrl button.sec{background:var(--paper);color:var(--ink);box-shadow:0 4px 0 var(--line)}
-.ctrl button[hidden]{display:none}
+.ctrl button[hidden],.ctrl .auto[hidden]{display:none}
+.ctrl .auto{background:rgba(29,53,40,.85);color:#fff;border-radius:999px;padding:.5em 1.2em;font-family:var(--display);font-weight:800;font-size:clamp(14px,1.8vmin,22px);white-space:nowrap}
 .tools{position:absolute;top:clamp(8px,1.6vh,18px);right:clamp(8px,1.4vw,18px);display:flex;flex-direction:column;gap:6px;z-index:6}
 .ic{background:var(--paper);border-radius:12px;padding:6px 12px;font-size:.72em;color:var(--muted)}
 
@@ -144,43 +149,39 @@ const ART={
 };
 const DEFAULT_TOPIC='Bahasa Indonesia – Informasi dalam Gambar';
 const DEFAULT=[
-{q:'Langkah pertama menjelaskan informasi dalam gambar adalah ...',a:['memperhatikan gambar secara keseluruhan','langsung menulis cerita']},
-{q:'Dalam gambar, kita perlu memperhatikan tokoh, kegiatan, waktu, tempat, dan ...',a:['suasana','harga']},
-{q:'Jika gambar dilengkapi keterangan, kita sebaiknya ...',a:['membacanya dengan teliti','melewatinya saja']},
-{q:'Informasi dari gambar ditulis dengan bahasa Indonesia yang ...',a:['baik dan benar','singkat dan acak']},
-{q:'Informasi dari gambar perlu ditulis dalam bentuk kalimat ...',a:['tunggal','tanya']},
-{q:'Kalimat tunggal memiliki ...',a:['satu subjek dan satu predikat','dua subjek dan dua predikat']},
-{q:'Huruf S pada pola kalimat adalah singkatan dari ...',a:['subjek','sifat']},
-{q:'Huruf P pada pola kalimat adalah singkatan dari ...',a:['predikat','pelaku']},
-{q:'Huruf O pada pola kalimat adalah singkatan dari ...',a:['objek','orang']},
-{q:'Huruf K pada pola kalimat adalah singkatan dari ...',a:['keterangan','kalimat']},
-{q:'"Sita membaca buku di perpustakaan." Subjeknya adalah ...',a:['Sita','buku']},
-{q:'"Sita membaca buku di perpustakaan." Predikatnya adalah ...',a:['membaca','di perpustakaan']},
-{q:'"Sita membaca buku di perpustakaan." Objeknya adalah ...',a:['buku','Sita']},
-{q:'"Sita membaca buku di perpustakaan." Keterangannya adalah ...',a:['di perpustakaan','membaca']},
-{q:'"Ayah mencuci mobil di halaman." Predikatnya adalah ...',a:['mencuci','mobil']},
-{q:'"Ibu menyapu lantai di dapur." Objeknya adalah ...',a:['lantai','Ibu']},
-{q:'"Adik minum susu di meja makan." Keterangannya adalah ...',a:['di meja makan','susu']},
-{q:'"Kakak menulis surat di kamar." Subjeknya adalah ...',a:['Kakak','surat']},
-{q:'Bagian kalimat yang menunjukkan tempat disebut ...',a:['keterangan','objek']},
-{q:'Bagian kalimat yang menunjukkan kegiatan disebut ...',a:['predikat','subjek']},
-{q:'Bagian kalimat yang melakukan kegiatan disebut ...',a:['subjek','objek']},
-{q:'Kalimat yang memiliki subjek, predikat, objek, dan keterangan adalah ...',a:['Rina membaca komik di kelas.','Rina di kelas.']},
-{q:'Kalimat yang lengkap adalah ...',a:['Budi menendang bola di lapangan.','Menendang bola di lapangan.']},
-{q:'Penulisan kalimat yang benar adalah ...',a:['Dina menyiram bunga di taman.','dina menyiram bunga di taman']},
-{q:'Setelah menuliskan informasi, kita dapat menulis ... berdasarkan gambar.',a:['cerita','lagu']},
-{q:'Cerita berdasarkan gambar harus disusun secara ...',a:['runtut','acak']},
-{img:'siram',q:'Kalimat yang sesuai dengan gambar adalah ...',a:['Dayu menyiram bunga di taman.','Dayu memetik bunga di taman.']},
-{img:'bola',q:'Kalimat yang sesuai dengan gambar adalah ...',a:['Raka menendang bola di lapangan.','Raka melempar bola di kelas.']},
-{img:'masak',q:'Kalimat yang sesuai dengan gambar adalah ...',a:['Ibu memasak sayur di dapur.','Ibu mencuci baju di dapur.']},
-{img:'baca',q:'Kalimat yang sesuai dengan gambar adalah ...',a:['Beni membaca buku di taman.','Beni menulis surat di taman.']},
-{img:'baca',q:'Di mana Beni membaca buku?',a:['di taman','di perpustakaan']},
-{img:'siram',q:'Apa yang disiram oleh Dayu?',a:['bunga','rumput']},
-{img:'bola',q:'Siapa tokoh dalam gambar ini?',a:['Raka','Ibu']},
-{img:'masak',q:'Kegiatan dalam gambar ini adalah ...',a:['memasak','menyapu']},
+{img:'siram',q:'Siapa nama anak di gambar?',a:['Dayu','Raka']},
+{img:'siram',q:'Dayu sedang ...',a:['menyiram bunga','makan nasi']},
+{img:'siram',q:'Apa yang disiram Dayu?',a:['bunga','mobil']},
+{img:'siram',q:'Di mana Dayu menyiram bunga?',a:['di taman','di kelas']},
+{img:'bola',q:'Siapa nama anak di gambar?',a:['Raka','Beni']},
+{img:'bola',q:'Raka sedang ...',a:['menendang bola','membaca buku']},
+{img:'bola',q:'Di mana Raka bermain bola?',a:['di lapangan','di dapur']},
+{img:'masak',q:'Siapa yang ada di gambar?',a:['Ibu','Adik']},
+{img:'masak',q:'Ibu sedang ...',a:['memasak','tidur']},
+{img:'masak',q:'Di mana Ibu memasak?',a:['di dapur','di taman']},
+{img:'baca',q:'Beni sedang ...',a:['membaca buku','bermain bola']},
+{img:'baca',q:'Apa yang dibaca Beni?',a:['buku','koran']},
+{img:'baca',q:'Di mana Beni membaca buku?',a:['di taman','di kamar mandi']},
+{img:'siram',q:'Kalimat yang cocok dengan gambar adalah ...',a:['Dayu menyiram bunga.','Dayu menendang bola.']},
+{img:'bola',q:'Kalimat yang cocok dengan gambar adalah ...',a:['Raka menendang bola.','Raka memasak sayur.']},
+{img:'masak',q:'Kalimat yang cocok dengan gambar adalah ...',a:['Ibu memasak di dapur.','Ibu membaca di taman.']},
+{img:'baca',q:'Kalimat yang cocok dengan gambar adalah ...',a:['Beni membaca buku.','Beni menyiram bunga.']},
+{q:'Sebelum menulis, kita harus ... gambar dengan teliti.',a:['melihat','menutup']},
+{q:'Pada gambar, kita melihat tokoh, kegiatan, dan ...',a:['tempat','harga']},
+{q:'"Sita membaca buku." Siapa yang membaca?',a:['Sita','buku']},
+{q:'"Sita membaca buku." Sita sedang ...',a:['membaca','menulis']},
+{q:'"Adik minum susu." Apa yang diminum Adik?',a:['susu','teh']},
+{q:'"Ayah mencuci mobil di halaman." Di mana Ayah mencuci mobil?',a:['di halaman','di dapur']},
+{q:'"Kakak menyapu lantai." Kakak sedang ...',a:['menyapu','memasak']},
+{q:'Kalimat yang lengkap adalah ...',a:['Rina membaca buku.','Membaca buku.']},
+{q:'Kalimat diawali dengan huruf ...',a:['besar (kapital)','kecil']},
+{q:'Kalimat diakhiri dengan tanda ...',a:['titik ( . )','koma ( , )']},
+{q:'Penulisan kalimat yang benar adalah ...',a:['Budi bermain bola.','budi bermain bola']},
+{q:'Orang yang melakukan kegiatan dalam kalimat disebut ...',a:['subjek','objek']},
+{q:'"Di taman" dalam kalimat menunjukkan ...',a:['tempat','waktu']},
 ].map((x,i)=>{const swap=i%2===1;return {q:x.q,A:swap?x.a[1]:x.a[0],B:swap?x.a[0]:x.a[1],key:swap?'B':'A',img:x.img||''}});
 
-const STORE='benar-salah-soal-v1';
+const STORE='benar-salah-soal-v1',REVEAL=5;
 const $=(s,r=document)=>r.querySelector(s);
 const ui=$('#ui'),stage=$('#stage'),video=$('#cam');
 const shuffle=(a)=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -188,7 +189,7 @@ const esc=(t)=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;
 
 let DATA={topic:DEFAULT_TOPIC,items:DEFAULT};
 try{const s=JSON.parse(localStorage.getItem(STORE)||'null');if(s&&Array.isArray(s.items)&&s.items.length)DATA=s}catch(e){}
-let G={total:10,qtime:10,cam:true,sound:true,shuffle:true,deck:[],qi:0,cur:null,state:'idle',qStart:0,left:0,lastBeep:-1};
+let G={name:'',total:5,qtime:10,paused:false,revealAt:0,cam:true,sound:true,shuffle:true,deck:[],qi:0,cur:null,state:'idle',qStart:0,left:0,lastBeep:-1};
 let audio=null,stream=null,raf=0;
 
 function saveData(){try{localStorage.setItem(STORE,JSON.stringify(DATA))}catch(e){}}
@@ -202,9 +203,10 @@ function intro(msg){
   if(!totals.includes(G.total))G.total=Math.min(10,n);
   ui.innerHTML=`<section class="intro">
     <h1><span class="a">Benar</span> <span class="b">Salah</span></h1>
-    <p>Semua siswa berdiri di depan IFP. Baca soal, lalu <b>pindah ke sisi kiri untuk jawaban A</b> atau <b>sisi kanan untuk jawaban B</b> sebelum waktu habis. Sisi yang benar menjadi hijau, sisi yang salah menjadi merah.</p>
+    <p>Siswa maju bergiliran dan berdiri di depan IFP. Baca soal, lalu <b>pindah ke sisi kiri untuk jawaban A</b> atau <b>sisi kanan untuk jawaban B</b> sebelum waktu habis. Sisi yang benar menjadi hijau, sisi yang salah menjadi merah. Urutan soal dan letak jawaban diacak ulang di setiap giliran.</p>
     <div class="setup">
       <div class="topic">${esc(DATA.topic||'Tanpa judul')}<small>${n} soal tersimpan</small></div>
+      <label class="pname" for="nm">Nama siswa yang maju (boleh dikosongkan)<input id="nm" maxlength="30" value="${esc(G.name)}" placeholder="Tulis nama siswa"></label>
       <div class="opts-row"><span class="optlabel">Jumlah soal</span>
         <div class="seg" data-k="total">${totals.map(v=>`<button type="button" data-v="${v}" aria-pressed="${G.total===v}">${v===n&&![5,10,15,20].includes(v)?'Semua ('+v+')':v+' soal'}</button>`).join('')}</div></div>
       <div class="opts-row"><span class="optlabel">Waktu per soal</span>
@@ -218,7 +220,7 @@ function intro(msg){
     </div>
   </section>`;
   ui.querySelectorAll('.seg').forEach(seg=>seg.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const k=seg.dataset.k,v=+b.dataset.v;G[k]=(k==='cam'||k==='shuffle')?!!v:v;seg.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b))}));
-  $('#go').onclick=prepare;
+  $('#go').onclick=()=>{G.name=$('#nm').value.trim();prepare()};
   $('#edit').onclick=editor;
 }
 
@@ -238,15 +240,15 @@ async function prepare(){
 
 function start(){
   const base=G.shuffle?shuffle(DATA.items):[...DATA.items];
-  G.deck=base.slice(0,Math.min(G.total,base.length));G.qi=0;
+  G.deck=base.slice(0,Math.min(G.total,base.length)).map(x=>Math.random()<.5?{...x}:{...x,A:x.B,B:x.A,key:x.key==='A'?'B':'A'});G.qi=0;
   video.style.display=G.cam?'':'none';
-  ui.innerHTML=`<div class="timer" id="tm"><b id="tn"></b></div>
+  ui.innerHTML=`<div class="timer" id="tm"><b id="tn"></b></div><div class="who" ${G.name?'':'hidden'}>${esc(G.name)}</div>
     <div class="qcard"><div class="pic" id="pic" hidden></div><div class="txt"><small id="qn"></small><div class="qt" id="qt"></div></div></div>
     <div class="opt a" id="oA"><span class="k">A</span><span class="tx" id="xA"></span></div>
     <div class="opt b" id="oB"><span class="k">B</span><span class="tx" id="xB"></span></div>
-    <div class="ctrl"><button type="button" id="show">Tampilkan jawaban</button><button type="button" id="next" hidden>Soal berikutnya</button></div>
+    <div class="ctrl"><button type="button" id="show">Tampilkan jawaban</button><button type="button" class="sec" id="pause">Jeda</button><span class="auto" id="auto" hidden></span></div>
     <div class="tools"><button class="ic" id="snd" type="button">${G.sound?'Suara: nyala':'Suara: mati'}</button><button class="ic" id="fs" type="button">Layar penuh</button><button class="ic" id="menu" type="button">Menu</button></div>`;
-  $('#show').onclick=reveal;$('#next').onclick=nextQ;
+  $('#show').onclick=reveal;$('#pause').onclick=togglePause;G.paused=false;
   $('#snd').onclick=()=>{G.sound=!G.sound;$('#snd').textContent=G.sound?'Suara: nyala':'Suara: mati'};
   $('#fs').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{})}catch(e){}};
   $('#menu').onclick=()=>intro();
@@ -270,7 +272,7 @@ function nextQ(){
   const pic=$('#pic');if(q.img&&ART[q.img]){pic.innerHTML=ART[q.img];pic.hidden=false}else{pic.innerHTML='';pic.hidden=true}
   $('#xA').textContent=q.A;$('#xB').textContent=q.B;
   $('#oA').className='opt a';$('#oB').className='opt b';
-  $('#show').hidden=false;$('#next').hidden=true;
+  $('#show').hidden=false;$('#auto').hidden=true;
   G.state='play';G.qStart=performance.now();G.lastBeep=-1;
 }
 
@@ -283,12 +285,22 @@ function reveal(){
   const d=document.createElement('div');d.className='answer';d.textContent='JAWABAN: '+k;ui.appendChild(d);
   sfx.reveal();
   $('#tn').textContent='0';$('#tm').style.setProperty('--t',0);
-  $('#show').hidden=true;$('#next').hidden=false;
-  $('#next').textContent=G.qi>=G.deck.length?'Selesai':'Soal berikutnya';
+  $('#show').hidden=true;$('#auto').hidden=false;
+  G.revealAt=performance.now();
 }
+function togglePause(){G.paused=!G.paused;$('#pause').textContent=G.paused?'Lanjutkan':'Jeda'}
 
+let lastNow=0;
 function loop(now){
   raf=requestAnimationFrame(loop);
+  const dt=lastNow?now-lastNow:0;lastNow=now;
+  if(G.paused){G.qStart+=dt;G.revealAt+=dt;return}
+  if(G.state==='reveal'){
+    const wait=Math.ceil(REVEAL-(now-G.revealAt)/1000);
+    $('#auto').textContent=G.qi>=G.deck.length?`Selesai dalam ${Math.max(0,wait)}`:`Soal berikutnya dalam ${Math.max(0,wait)}`;
+    if(wait<=0)nextQ();
+    return;
+  }
   if(G.state!=='play')return;
   const left=Math.max(0,G.qtime-(now-G.qStart)/1000),sec=Math.ceil(left);
   $('#tn').textContent=sec;
@@ -300,11 +312,11 @@ function loop(now){
 function finish(){
   G.state='over';sfx.end();setHalves('');
   document.body.insertAdjacentHTML('beforeend',`<div class="ov"><div class="ovbox">
-    <h2>Permainan selesai!</h2>
+    <h2>${G.name?esc(G.name)+' selesai!':'Giliran selesai!'}</h2>
     <p class="hint">${G.deck.length} soal sudah dimainkan.</p>
-    <div class="row"><button class="big" id="again" type="button">Main lagi</button><button class="btn" id="back" type="button">Ganti pengaturan</button></div>
+    <div class="row"><button class="big" id="nextp" type="button">Siswa berikutnya</button><button class="btn" id="back" type="button">Ganti pengaturan</button></div>
   </div></div>`);
-  $('#again').onclick=()=>{document.querySelector('.ov').remove();start()};
+  $('#nextp').onclick=()=>{G.name='';intro();setTimeout(()=>$('#nm')?.focus(),50)};
   $('#back').onclick=()=>intro();
 }
 
@@ -345,7 +357,7 @@ function editor(){
   };
 }
 
-addEventListener('keydown',e=>{if(e.target.closest&&e.target.closest('input,textarea'))return;if(e.key===' '||e.key==='Enter'){if(G.state==='play'){e.preventDefault();reveal()}else if(G.state==='reveal'){e.preventDefault();nextQ()}}});
+addEventListener('keydown',e=>{if(e.target.closest&&e.target.closest('input,textarea'))return;if(e.key===' '||e.key==='Enter'){if(G.state==='play'){e.preventDefault();reveal()}else if(G.state==='reveal'){e.preventDefault();nextQ()}}if(e.key==='p'||e.key==='P'){if(G.state==='play'||G.state==='reveal')togglePause()}});
 intro();
 </script>
 </body>
