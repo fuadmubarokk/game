@@ -73,7 +73,7 @@ button:focus-visible,a:focus-visible{outline:4px solid var(--ink);outline-offset
   <header class="top">
     <div class="brand"><img src="logo.png" alt="Logo SD Queen Al-Amin" onerror="this.remove()"><span>SD Queen Al-Amin</span></div>
     <h1>Game <span>Pembe</span><span>lajaran</span></h1>
-    <p>Pilih game, lalu ketuk Main. Setiap game dimainkan dua kelompok di IFP.</p>
+    <p>Pilih game, lalu ketuk Main. Semua game dimainkan di IFP.</p>
     <div class="tools"><button class="ic" id="fs" type="button">Layar penuh</button></div>
   </header>
   <div class="bar">
@@ -90,6 +90,7 @@ const GAMES=[
   {file:'tarik-tambang-siklus.html',judul:'Tarik Tambang Siklus',mapel:'IPAS',kelas:'Kelas III',materi:'Siklus Hidup Hewan',ket:'Jawab soal siklus hidup hewan dengan benar untuk menarik tali ke arah kelompokmu.',warna:'#E8742A',lembut:'#FDE3D0',tua:'#B9531B',ikon:'tambang'},
   {file:'balap-karung-perkalian.html',judul:'Balap Karung Perkalian',mapel:'Matematika',kelas:'Kelas III',materi:'Perkalian sebagai Penjumlahan Berulang',ket:'Jawab soal perkalian 1 sampai 5 dengan benar agar pelari karung kelompokmu melompat ke garis finis.',warna:'#2A74C9',lembut:'#D6E6F8',tua:'#1B5496',ikon:'karung'},
   {file:'menangkap-nyamuk.html',judul:'Menangkap Nyamuk',mapel:'IPAS',kelas:'Kelas III',materi:'Pengaruh Perubahan di Alam (Siang-Malam dan Cuaca)',ket:'Pakai kamera IFP: tangkap nyamuk yang membawa jawaban benar dengan gerakan tangan. Benar +1, salah −1.',warna:'#2E9E5B',lembut:'#D4F1DF',tua:'#1E6E3F',ikon:'nyamuk'},
+  {file:'benar-salah.html',judul:'Benar Salah',mapel:'Bahasa Indonesia',kelas:'Kelas III',materi:'Informasi dalam Gambar',ket:'Pakai kamera IFP: semua siswa berdiri, lalu pindah ke sisi kiri (A) atau kanan (B). Sisi benar hijau, sisi salah merah. Soal bisa diganti untuk mapel apa pun.',warna:'#C0577A',lembut:'#F8DCE6',tua:'#8E3456',ikon:'benarsalah'},
 ];
 
 const kid=(x,shirt,dir)=>`<g transform="translate(${x} 0) scale(${dir} 1)"><g transform="rotate(-10 0 150)">
@@ -129,6 +130,14 @@ const ART={
     ${m(70,80,1.3)}${m(120,122,1.1)}${m(215,76,1.2)}${m(262,120,1.3)}
     <circle cx="112" cy="122" r="13" fill="rgba(232,116,42,.55)" stroke="#fff" stroke-width="3"/>
     <circle cx="258" cy="80" r="13" fill="rgba(42,116,201,.55)" stroke="#fff" stroke-width="3"/></svg>`},
+  benarsalah:()=>`<svg viewBox="0 0 320 160" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs><linearGradient id="bsg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BFE3F5"/><stop offset="1" stop-color="#DDEFE3"/></linearGradient></defs>
+    <rect width="320" height="160" fill="url(#bsg)"/>
+    <rect x="60" y="12" width="200" height="34" rx="12" fill="#FBFDF7"/><rect x="90" y="25" width="140" height="8" rx="4" fill="#557261" opacity=".5"/>
+    <rect x="14" y="96" width="120" height="52" rx="14" fill="#D4F1DF" stroke="#2E9E5B" stroke-width="4"/><rect x="24" y="108" width="28" height="28" rx="8" fill="#2E9E5B"/><text x="38" y="129" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="800" font-size="20" fill="#fff">A</text><rect x="60" y="118" width="62" height="8" rx="4" fill="#2E9E5B" opacity=".5"/>
+    <rect x="186" y="96" width="120" height="52" rx="14" fill="#FADAD7" stroke="#D2433A" stroke-width="4"/><rect x="196" y="108" width="28" height="28" rx="8" fill="#D2433A"/><text x="210" y="129" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="800" font-size="20" fill="#fff">B</text><rect x="232" y="118" width="62" height="8" rx="4" fill="#D2433A" opacity=".5"/>
+    <text x="160" y="84" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="800" font-size="26" fill="#2E9E5B">BENAR!</text>
+    <circle cx="70" cy="80" r="12" fill="rgba(255,201,60,.7)" stroke="#fff" stroke-width="3"/></svg>`,
   umum:(g)=>`<svg viewBox="0 0 320 160" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
     <rect width="320" height="160" fill="${g.lembut}"/>
     <circle cx="160" cy="80" r="46" fill="${g.warna}"/>
